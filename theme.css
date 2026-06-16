@@ -213,9 +213,10 @@ body {
    2. LIGHT MODE  —  warm paper palette
    ===================================================================== */
 .theme-light {
-    --cc-accent-light: #c15f3c;            /* Crail — links/accent on light */
+    --cc-accent-light: #c15f3c;            /* Crail — brand coral for UI elements */
     --cc-accent-bright: #d97757;           /* Claude coral */
     --cc-accent: var(--cc-accent-light);   /* picker-driven base for all tints */
+    --cc-link-light: #b0532f;              /* darker coral for link TEXT only — 4.6:1 on cream (AA) */
 
     --cc-bg:        #f9f3e7;                /* main note surface (warm paper) */
     --cc-bg-alt:    #f0e9da;                /* sidebars / secondary */
@@ -252,7 +253,7 @@ body {
     --text-muted:    var(--cc-text-muted);
     --text-faint:    var(--cc-text-faint);
     --text-on-accent: #fffaf5;
-    --text-accent:   var(--cc-accent-light);
+    --text-accent:   var(--cc-link-light);   /* AA-safe link text; brand coral stays on UI elements */
     --text-accent-hover: var(--cc-accent-bright);
     --text-selection: var(--cc-selection);
     --text-highlight-bg: color-mix(in srgb, var(--cc-accent) 22%, transparent);
@@ -287,6 +288,15 @@ body {
     --cc-table-bg:     #f7f1e5;             /* table body — quiet warm */
     --cc-table-header: #f1dcc4;             /* header — keeps the orange */
     --cc-table-border: #e6dcc9;             /* soft, muted grid lines */
+
+    /* Graph view — coral nodes, clearly visible warm links */
+    --graph-line:             #c0ad93;
+    --graph-node:             #c15f3c;
+    --graph-node-focused:     #d97757;
+    --graph-node-tag:         #9a8f78;
+    --graph-node-attachment:  #b3a78e;
+    --graph-node-unresolved:  #bcb4a2;
+    --graph-text:             #34322c;
 
     --bold-color: var(--cc-heading);
     --italic-color: inherit;
@@ -371,6 +381,15 @@ body {
     --cc-table-bg:     #2b2824;             /* table body — quiet warm lift */
     --cc-table-header: #3a3128;             /* header — clean warm (not muddy) */
     --cc-table-border: #423a2f;             /* soft, muted grid lines */
+
+    /* Graph view — salmon nodes, clearly visible links on charcoal */
+    --graph-line:             #5f594f;
+    --graph-node:             #e8916f;
+    --graph-node-focused:     #f0a487;
+    --graph-node-tag:         #8a8174;
+    --graph-node-attachment:  #6f685d;
+    --graph-node-unresolved:  #6e685d;
+    --graph-text:             #e6e4dc;
 
     --bold-color: var(--cc-heading);
     --italic-color: inherit;
@@ -947,10 +966,15 @@ button.mod-cta { font-weight: 600; }
 .suggestion-item.is-selected { background-color: var(--cc-selection); }
 
 /* Graph view in theme colors */
-.graph-view.color-fill { color: var(--cc-accent-bright); }
-.graph-view.color-line { color: var(--cc-border); }
-.graph-view.color-text { color: var(--cc-text-muted); }
-.graph-view.color-circle { color: var(--cc-accent-bright); }
+.graph-view.color-fill { color: var(--graph-node); }
+.graph-view.color-line { color: var(--graph-line); }
+.graph-view.color-text { color: var(--graph-text); }
+.graph-view.color-circle { color: var(--graph-node-focused); }
+.graph-view.color-fill-focused { color: var(--graph-node-focused); }
+.graph-view.color-fill-tag { color: var(--graph-node-tag); }
+.graph-view.color-fill-attachment { color: var(--graph-node-attachment); }
+.graph-view.color-fill-unresolved { color: var(--graph-node-unresolved); }
+.graph-view.color-arrow { color: var(--graph-line); }
 
 /* Scrollbars stay quiet */
 ::-webkit-scrollbar-thumb { border-radius: 999px; }
@@ -990,3 +1014,19 @@ button.mod-cta { font-weight: 600; }
 }
 .modal.mod-settings .setting-item-name { font-size: calc(var(--font-ui-medium) + 2px); }
 .modal.mod-settings .setting-item-description { font-size: calc(var(--font-ui-smaller) + 2px); }
+
+/* =====================================================================
+   10. REDUCED MOTION  —  honour the OS "reduce motion" setting
+   ---------------------------------------------------------------------
+   When the user has asked their system to minimise motion, collapse all
+   transitions/animations to near-instant. Duration stays > 0 so any
+   transitionend / animationend listeners still fire.
+   ===================================================================== */
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+        transition-duration: 0.01ms !important;
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        scroll-behavior: auto !important;
+    }
+}

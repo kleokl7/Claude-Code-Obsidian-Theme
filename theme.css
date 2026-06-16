@@ -73,6 +73,16 @@ settings:
         step: 1
         format: rem
     -
+        id: cc-nav-font-size
+        title: File & folder name size (px)
+        description: Font size for names in the file explorer.
+        type: variable-number-slider
+        default: 16
+        min: 11
+        max: 20
+        step: 1
+        format: px
+    -
         id: cc-folder-weight
         title: Folder name weight
         description: Weight of folder names in the file explorer.
@@ -174,6 +184,11 @@ body {
     --line-height-normal: var(--cc-line-height);
     --file-line-width: var(--cc-line-width);
 
+    /* Spacing — Obsidian's defaults (--p-spacing 1rem, --heading-spacing
+       ~2.4rem) cut by 50% */
+    --p-spacing: 0.5rem;
+    --heading-spacing: 1.2rem;
+
     /* --- Shape: Claude uses generous, soft corners --- */
     --radius-s: 6px;
     --radius-m: 10px;
@@ -182,9 +197,10 @@ body {
     --bold-weight: 700;
     --font-weight: 400;
 
-    /* File explorer name weights (Style-Settings driven) */
+    /* File explorer name weights + size (Style-Settings driven) */
     --cc-folder-weight: 700;
     --cc-file-weight: 500;
+    --cc-nav-font-size: 16px;
     --h1-weight: 700;
     --h2-weight: 700;
     --h3-weight: 600;
@@ -418,6 +434,27 @@ body.cc-active-line .markdown-source-view.mod-cm6 .cm-active.cm-gutterElement {
 
 /* Italics keep the body color, just slanted */
 .markdown-rendered em, .cm-em { font-style: italic; color: var(--italic-color); }
+
+/* Strikethrough — de-emphasised: muted text with a soft line through */
+.markdown-rendered del, .markdown-rendered s,
+.cm-s-obsidian .cm-strikethrough {
+    color: var(--cc-text-muted);
+    text-decoration-line: line-through;
+    text-decoration-color: var(--cc-text-faint);
+    text-decoration-thickness: 1px;
+}
+
+/* Highlight (==text==) — coral-tinted mark, body text on top */
+.markdown-rendered mark {
+    background-color: var(--text-highlight-bg);
+    color: var(--cc-text);
+    border-radius: 3px;
+    padding: 0.05em 0.18em;
+}
+.cm-s-obsidian .cm-highlight {
+    background-color: var(--text-highlight-bg);
+    color: var(--cc-text);
+}
 
 /* Link decoration is driven through Obsidian's own variables so nothing can
    silently re-underline: internal/page links never underline; external do. */
@@ -728,13 +765,14 @@ input[type="checkbox"]:checked {
     background-color: var(--interactive-accent);
     border-color: var(--interactive-accent);
 }
+/* Checked state: a crisp white tick (✓) — reads as "done" */
 input[type="checkbox"]:checked::after {
     content: "";
     position: absolute;
-    left: 0.42em; top: 0.18em;
-    width: 0.26em; height: 0.52em;
-    border: solid var(--text-on-accent);
-    border-width: 0 2px 2px 0;
+    left: 0.44em; top: 0.15em;
+    width: 0.3em; height: 0.56em;
+    border: solid #ffffff;
+    border-width: 0 2.5px 2.5px 0;
     transform: rotate(45deg);
 }
 .markdown-rendered li.task-list-item[data-task="x"] .task-list-item-checkbox + *,
@@ -819,7 +857,11 @@ input[type="checkbox"]:checked::after {
 }
 .workspace-tab-header.is-active .workspace-tab-header-inner-title { font-weight: 600; }
 
-/* File explorer hierarchy: bold folders, medium files (same font) */
+/* File explorer hierarchy: bold folders, medium files (same font + size) */
+.workspace-leaf-content[data-type="file-explorer"] .nav-folder-title-content,
+.workspace-leaf-content[data-type="file-explorer"] .nav-file-title-content {
+    font-size: var(--cc-nav-font-size);
+}
 .workspace-leaf-content[data-type="file-explorer"] .nav-folder-title-content {
     font-weight: var(--cc-folder-weight);
     color: var(--cc-heading);
@@ -939,3 +981,12 @@ button.mod-cta { font-weight: 600; }
 
 /* Selection */
 ::selection { background-color: var(--text-selection); }
+
+/* Settings window — bump the UI text +2px for readability */
+.modal.mod-settings { font-size: calc(var(--font-ui-small) + 2px); }
+.modal.mod-settings .vertical-tab-nav-item,
+.modal.mod-settings .vertical-tab-header-group-title {
+    font-size: calc(var(--font-ui-small) + 2px);
+}
+.modal.mod-settings .setting-item-name { font-size: calc(var(--font-ui-medium) + 2px); }
+.modal.mod-settings .setting-item-description { font-size: calc(var(--font-ui-smaller) + 2px); }

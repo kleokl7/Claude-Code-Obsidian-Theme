@@ -1,0 +1,941 @@
+/* =====================================================================
+   CLAUDE CODE  —  an Obsidian theme
+   ---------------------------------------------------------------------
+   A faithful recreation of the look & feel of Claude Code in the Claude
+   mobile app: warm cream / charcoal backgrounds, the coral accent,
+   Styrene-style grotesque type, and a calm reading rhythm.
+
+   Fonts are free lookalikes for Claude's proprietary typefaces:
+     • Hanken Grotesk  ≈ Styrene B      (interface + body)
+     • Source Serif 4  ≈ Tiempos Text   (optional serif reading mode)
+     • JetBrains Mono  ≈ code typeface  (code blocks / inline code)
+   If you own the real fonts (Styrene B / Tiempos Text), they sit at the
+   front of every stack and will be used automatically.
+
+   Works in both Light and Dark. Supports the Style Settings plugin.
+   ===================================================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Hanken+Grotesk:ital,wght@0,300..800;1,300..800&family=Source+Serif+4:ital,opsz,wght@0,8..60,300..700;1,8..60,300..700&family=JetBrains+Mono:ital,wght@0,400..700;1,400..700&display=swap');
+
+/* ---------------------------------------------------------------------
+   STYLE SETTINGS  (https://github.com/mgmeyers/obsidian-style-settings)
+   --------------------------------------------------------------------- */
+/* @settings
+
+name: Claude Code
+id: claude-code-theme
+settings:
+    -
+        id: cc-typography
+        title: Typography
+        type: heading
+        level: 1
+        collapsed: false
+    -
+        id: claude-serif-body
+        title: Serif reading mode
+        description: Use a Tiempos-style serif for note body text, like Claude's serif reading mode. Headings and the interface stay sans.
+        type: class-toggle
+        default: false
+    -
+        id: claude-serif-headings
+        title: Serif headings
+        description: Render headings in the serif as well (pairs nicely with serif reading mode).
+        type: class-toggle
+        default: false
+    -
+        id: cc-body-font-size
+        title: Body font size (px)
+        description: Base font size for note text.
+        type: variable-number-slider
+        default: 18
+        min: 13
+        max: 22
+        step: 1
+        format: px
+    -
+        id: cc-line-height
+        title: Line height
+        description: Body line height.
+        type: variable-number-slider
+        default: 1.6
+        min: 1.2
+        max: 2
+        step: 0.05
+    -
+        id: cc-line-width
+        title: Readable line length (rem)
+        description: Maximum width of text in the editor when "Readable line length" is on.
+        type: variable-number-slider
+        default: 42
+        min: 30
+        max: 60
+        step: 1
+        format: rem
+    -
+        id: cc-folder-weight
+        title: Folder name weight
+        description: Weight of folder names in the file explorer.
+        type: variable-select
+        default: '700'
+        options:
+            -
+                label: Medium
+                value: '500'
+            -
+                label: Semibold
+                value: '600'
+            -
+                label: Bold
+                value: '700'
+    -
+        id: cc-file-weight
+        title: File name weight
+        description: Weight of file names in the file explorer.
+        type: variable-select
+        default: '500'
+        options:
+            -
+                label: Regular
+                value: '400'
+            -
+                label: Medium
+                value: '500'
+            -
+                label: Semibold
+                value: '600'
+    -
+        id: cc-color
+        title: Color
+        type: heading
+        level: 1
+        collapsed: false
+    -
+        id: cc-accent-light
+        title: Accent color (light mode)
+        description: The Claude coral. Drives links, active elements and highlights.
+        type: variable-color
+        format: hex
+        default: '#c15f3c'
+    -
+        id: cc-accent-dark
+        title: Accent color (dark mode)
+        description: The Claude coral for dark mode.
+        type: variable-color
+        format: hex
+        default: '#d97757'
+    -
+        id: cc-loud-code
+        title: Loud code blocks
+        description: On — code blocks use a blue frame so they stand out. Off — code blocks stay warm, in line with the Claude coral theme.
+        type: class-toggle
+        default: true
+    -
+        id: claude-mono-headings
+        title: Monospace headings
+        description: Give headings a terminal / code feel by setting them in the monospace font.
+        type: class-toggle
+        default: false
+    -
+        id: cc-editor
+        title: Editor
+        type: heading
+        level: 1
+        collapsed: false
+    -
+        id: cc-active-line
+        title: Highlight active line
+        description: Add a very light tint behind the line your cursor is currently on in the editor.
+        type: class-toggle
+        default: true
+*/
+
+/* =====================================================================
+   1. GLOBAL  —  fonts, radii, shared tokens
+   ===================================================================== */
+body {
+    /* --- Font stacks: real Claude fonts first, free lookalikes next --- */
+    --cc-font-sans: "Styrene B", "Styrene A", "Hanken Grotesk", "Schibsted Grotesk",
+        -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    --cc-font-serif: "Tiempos Text", "Tiempos", "Source Serif 4", "Source Serif Pro",
+        Charter, Georgia, "Times New Roman", serif;
+    --cc-font-mono: "Söhne Mono", "Berkeley Mono", "JetBrains Mono", "Fira Code",
+        ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+
+    --font-interface-theme: var(--cc-font-sans);
+    --font-text-theme: var(--cc-font-sans);
+    --font-monospace-theme: var(--cc-font-mono);
+
+    /* --- Sizing (Style-Settings driven) --- */
+    --cc-body-font-size: 18px;
+    --cc-line-height: 1.6;
+    --cc-line-width: 42rem;
+    --font-text-size: var(--cc-body-font-size);
+    --line-height-normal: var(--cc-line-height);
+    --file-line-width: var(--cc-line-width);
+
+    /* --- Shape: Claude uses generous, soft corners --- */
+    --radius-s: 6px;
+    --radius-m: 10px;
+    --cc-radius: 12px;
+
+    --bold-weight: 700;
+    --font-weight: 400;
+
+    /* File explorer name weights (Style-Settings driven) */
+    --cc-folder-weight: 700;
+    --cc-file-weight: 500;
+    --h1-weight: 700;
+    --h2-weight: 700;
+    --h3-weight: 600;
+    --h4-weight: 600;
+    --h5-weight: 600;
+    --h6-weight: 600;
+}
+
+/* =====================================================================
+   2. LIGHT MODE  —  warm paper palette
+   ===================================================================== */
+.theme-light {
+    --cc-accent-light: #c15f3c;            /* Crail — links/accent on light */
+    --cc-accent-bright: #d97757;           /* Claude coral */
+    --cc-accent: var(--cc-accent-light);   /* picker-driven base for all tints */
+
+    --cc-bg:        #f9f3e7;                /* main note surface (warm paper) */
+    --cc-bg-alt:    #f0e9da;                /* sidebars / secondary */
+    --cc-bg-deep:   #e8dfcc;                /* code / inset surfaces */
+    --cc-bg-hover:  #e7decb;
+
+    --cc-text:       #34322c;               /* warm dark body text */
+    --cc-text-muted: #6e6a5c;
+    --cc-text-faint: #9a9684;
+    --cc-heading:    #1a1915;               /* near-black warm heading */
+    --cc-border:     #e6e3d8;
+    --cc-border-soft:#efece3;
+    --cc-selection:  color-mix(in srgb, var(--cc-accent) 18%, transparent);
+    --cc-active-line-bg: color-mix(in srgb, var(--cc-accent) 5%, transparent);
+
+    color-scheme: light;
+
+    --accent-h: 16;
+    --accent-s: 56%;
+    --accent-l: 50%;
+
+    --background-primary:        var(--cc-bg);
+    --background-primary-alt:     var(--cc-bg-alt);
+    --background-secondary:       var(--cc-bg-alt);
+    --background-secondary-alt:   var(--cc-bg-deep);
+    --background-modifier-hover:  var(--cc-bg-hover);
+    --background-modifier-active-hover: var(--cc-selection);
+    --background-modifier-border: var(--cc-border);
+    --background-modifier-border-hover: #dcd8cc;
+    --background-modifier-border-focus: var(--cc-accent-light);
+    --background-modifier-form-field: #fffdf7;
+
+    --text-normal:   var(--cc-text);
+    --text-muted:    var(--cc-text-muted);
+    --text-faint:    var(--cc-text-faint);
+    --text-on-accent: #fffaf5;
+    --text-accent:   var(--cc-accent-light);
+    --text-accent-hover: var(--cc-accent-bright);
+    --text-selection: var(--cc-selection);
+    --text-highlight-bg: color-mix(in srgb, var(--cc-accent) 22%, transparent);
+
+    --interactive-accent:        var(--cc-accent-light);
+    --interactive-accent-hover:  var(--cc-accent-bright);
+    --interactive-normal:        var(--cc-bg-alt);
+    --interactive-hover:         var(--cc-bg-hover);
+
+    --titlebar-background:        var(--cc-bg-alt);
+    --titlebar-background-focused:var(--cc-bg-alt);
+    --tab-background-active:      var(--cc-bg);
+
+    --quote-opacity: 1;
+    --hr-color: var(--cc-border);
+    --tag-color: var(--cc-accent-light);
+    --tag-background: color-mix(in srgb, var(--cc-accent) 12%, transparent);
+    --tag-background-hover: color-mix(in srgb, var(--cc-accent) 20%, transparent);
+    --blockquote-border-color: var(--cc-accent-bright);
+    --blockquote-background-color: transparent;
+    --scrollbar-thumb-bg: rgba(52, 50, 44, 0.16);
+    --scrollbar-active-thumb-bg: rgba(52, 50, 44, 0.32);
+
+    /* Code frame — warm by default; "Loud code blocks" switches it to blue */
+    --cc-code-bg:     #f0e8d6;              /* warm parchment inset */
+    --cc-code-border: #e1d5bd;
+    --cc-code-text:   #5c4f3b;              /* warm code text */
+    --code-background: var(--cc-bg-deep);
+    --code-normal: var(--cc-code-text);
+
+    --list-marker-color: var(--cc-accent-light);  /* orange bullets */
+    --cc-table-bg:     #f7f1e5;             /* table body — quiet warm */
+    --cc-table-header: #f1dcc4;             /* header — keeps the orange */
+    --cc-table-border: #e6dcc9;             /* soft, muted grid lines */
+
+    --bold-color: var(--cc-heading);
+    --italic-color: inherit;
+    --metadata-label-text-color: var(--cc-text-muted);
+}
+
+/* =====================================================================
+   3. DARK MODE  —  warm charcoal palette
+   ===================================================================== */
+.theme-dark {
+    --cc-accent-dark:   #d97757;            /* Claude coral */
+    --cc-accent-bright: #e8916f;            /* lifted coral for links on dark */
+    --cc-accent: var(--cc-accent-dark);    /* picker-driven base for all tints */
+
+    --cc-bg:        #262624;                /* main note surface (warm charcoal) */
+    --cc-bg-alt:    #1f1e1d;                /* sidebars / secondary */
+    --cc-bg-deep:   #1a1917;                /* code / inset surfaces */
+    --cc-bg-hover:  #302f2c;
+
+    --cc-text:       #e6e4dc;               /* warm off-white body text */
+    --cc-text-muted: #a8a496;
+    --cc-text-faint: #767264;
+    --cc-heading:    #f6f4ee;               /* bright warm heading */
+    --cc-border:     #393833;
+    --cc-border-soft:#322f2a;
+    --cc-selection:  color-mix(in srgb, var(--cc-accent) 26%, transparent);
+    --cc-active-line-bg: color-mix(in srgb, var(--cc-accent) 8%, transparent);
+
+    color-scheme: dark;
+
+    --accent-h: 16;
+    --accent-s: 62%;
+    --accent-l: 59%;
+
+    --background-primary:        var(--cc-bg);
+    --background-primary-alt:     var(--cc-bg-alt);
+    --background-secondary:       var(--cc-bg-alt);
+    --background-secondary-alt:   var(--cc-bg-deep);
+    --background-modifier-hover:  var(--cc-bg-hover);
+    --background-modifier-active-hover: var(--cc-selection);
+    --background-modifier-border: var(--cc-border);
+    --background-modifier-border-hover: #4a4942;
+    --background-modifier-border-focus: var(--cc-accent-dark);
+    --background-modifier-form-field: #1c1b19;
+
+    --text-normal:   var(--cc-text);
+    --text-muted:    var(--cc-text-muted);
+    --text-faint:    var(--cc-text-faint);
+    --text-on-accent: #1a1915;
+    --text-accent:   var(--cc-accent-bright);
+    --text-accent-hover: #f2a587;
+    --text-selection: var(--cc-selection);
+    --text-highlight-bg: color-mix(in srgb, var(--cc-accent) 28%, transparent);
+
+    --interactive-accent:        var(--cc-accent-dark);
+    --interactive-accent-hover:  var(--cc-accent-bright);
+    --interactive-normal:        var(--cc-bg-alt);
+    --interactive-hover:         var(--cc-bg-hover);
+
+    --titlebar-background:        var(--cc-bg-alt);
+    --titlebar-background-focused:var(--cc-bg-alt);
+    --tab-background-active:      var(--cc-bg);
+
+    --quote-opacity: 1;
+    --hr-color: var(--cc-border);
+    --tag-color: var(--cc-accent-bright);
+    --tag-background: color-mix(in srgb, var(--cc-accent) 16%, transparent);
+    --tag-background-hover: color-mix(in srgb, var(--cc-accent) 26%, transparent);
+    --blockquote-border-color: var(--cc-accent-dark);
+    --blockquote-background-color: transparent;
+    --scrollbar-thumb-bg: rgba(230, 228, 220, 0.16);
+    --scrollbar-active-thumb-bg: rgba(230, 228, 220, 0.3);
+
+    /* Code frame — warm by default; "Loud code blocks" switches it to blue */
+    --cc-code-bg:     #1f1b15;              /* warm dark inset */
+    --cc-code-border: #382f23;
+    --cc-code-text:   #d8cbb3;              /* warm code text */
+    --code-background: var(--cc-bg-deep);
+    --code-normal: var(--cc-code-text);
+
+    --list-marker-color: var(--cc-accent-dark);   /* orange bullets */
+    --cc-table-bg:     #2b2824;             /* table body — quiet warm lift */
+    --cc-table-header: #3a3128;             /* header — clean warm (not muddy) */
+    --cc-table-border: #423a2f;             /* soft, muted grid lines */
+
+    --bold-color: var(--cc-heading);
+    --italic-color: inherit;
+    --metadata-label-text-color: var(--cc-text-muted);
+}
+
+/* =====================================================================
+   4. TYPOGRAPHY  —  headings, body, bold, italics, links
+   ===================================================================== */
+
+/* Headings: tight, confident, like Claude's response titles */
+.markdown-rendered h1, .markdown-rendered h2, .markdown-rendered h3,
+.markdown-rendered h4, .markdown-rendered h5, .markdown-rendered h6,
+.cm-header, .inline-title,
+.HyperMD-header {
+    font-family: var(--cc-font-sans);
+    letter-spacing: -0.018em;
+    color: var(--cc-heading);
+}
+
+.inline-title { font-weight: 700; letter-spacing: -0.02em; }
+
+:is(.markdown-rendered, .markdown-source-view) h1,
+.HyperMD-header-1 { --h1-size: 1.9em;  line-height: 1.2; }
+:is(.markdown-rendered, .markdown-source-view) h2,
+.HyperMD-header-2 { --h2-size: 1.5em;  line-height: 1.25; }
+:is(.markdown-rendered, .markdown-source-view) h3,
+.HyperMD-header-3 { --h3-size: 1.25em; line-height: 1.3; }
+:is(.markdown-rendered, .markdown-source-view) h4,
+.HyperMD-header-4 { --h4-size: 1.08em; }
+:is(.markdown-rendered, .markdown-source-view) h5,
+.HyperMD-header-5 { --h5-size: 0.95em; text-transform: uppercase; letter-spacing: 0.06em; color: var(--cc-text-muted); }
+:is(.markdown-rendered, .markdown-source-view) h6,
+.HyperMD-header-6 { --h6-size: 0.88em; text-transform: uppercase; letter-spacing: 0.06em; color: var(--cc-text-faint); }
+
+/* The # markers stay quietly out of the way */
+.HyperMD-header .cm-formatting-header,
+.markdown-rendered .heading-collapse-indicator { color: var(--cc-text-faint); }
+
+/* Active line — a very light tint behind the row the cursor is on.
+   Toggle: Style Settings → Claude Code → Editor → Highlight active line. */
+body.cc-active-line .markdown-source-view.mod-cm6 .cm-active.cm-line,
+body.cc-active-line .markdown-source-view.mod-cm6 .cm-active.cm-gutterElement {
+    background-color: var(--cc-active-line-bg);
+    border-radius: var(--radius-s);
+}
+
+/* Body rhythm */
+.markdown-preview-view, .markdown-source-view {
+    font-family: var(--cc-font-sans);
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+}
+.markdown-rendered p { line-height: var(--cc-line-height); }
+
+/* Bold — Claude leans on weight + a touch more color contrast */
+.markdown-rendered strong, .cm-strong {
+    font-weight: var(--bold-weight);
+    color: var(--bold-color);
+}
+
+/* Italics keep the body color, just slanted */
+.markdown-rendered em, .cm-em { font-style: italic; color: var(--italic-color); }
+
+/* Link decoration is driven through Obsidian's own variables so nothing can
+   silently re-underline: internal/page links never underline; external do. */
+body {
+    --link-decoration: none;
+    --link-decoration-hover: none;
+    --link-external-decoration: underline;
+    --link-external-decoration-hover: underline;
+}
+
+/* All links use the Claude coral */
+.markdown-rendered a,
+.cm-link, .cm-url {
+    color: var(--text-accent);
+    transition: color 120ms ease, text-decoration-color 120ms ease;
+}
+.markdown-rendered a:hover,
+.cm-link:hover, .cm-url:hover {
+    color: var(--text-accent-hover);
+    text-decoration-color: var(--text-accent-hover);
+}
+
+/* External links: underlined in coral with a soft offset */
+.markdown-rendered a.external-link,
+.cm-link, .cm-url {
+    text-decoration-line: underline;
+    text-decoration-color: color-mix(in srgb, var(--cc-accent) 45%, transparent);
+    text-underline-offset: 0.18em;
+    text-decoration-thickness: 1px;
+}
+a.external-link { background-image: none; padding-right: 0; }
+
+/* Internal / page links: bold + orange, never underlined (reading + edit) */
+a.internal-link,
+a.internal-link.is-unresolved,
+.markdown-rendered a.internal-link,
+.markdown-preview-view a.internal-link,
+.cm-hmd-internal-link,
+.cm-s-obsidian .cm-hmd-internal-link {
+    font-weight: 700 !important;
+    color: var(--text-accent) !important;
+    text-decoration: none !important;
+}
+/* The span Obsidian uses to draw the internal-link underline in live preview */
+.cm-s-obsidian .cm-underline,
+.markdown-rendered a.internal-link .cm-underline {
+    text-decoration: none !important;
+}
+a.internal-link:hover,
+.markdown-rendered a.internal-link:hover,
+.cm-hmd-internal-link:hover {
+    color: var(--text-accent-hover) !important;
+    text-decoration: none !important;
+}
+
+/* =====================================================================
+   5. SERIF READING MODE  (Style Settings toggles)
+   ===================================================================== */
+body.claude-serif-body {
+    --font-text-theme: var(--cc-font-serif);
+}
+body.claude-serif-body .markdown-preview-view,
+body.claude-serif-body .markdown-source-view {
+    font-family: var(--cc-font-serif);
+    --cc-line-height: 1.7;
+}
+body.claude-serif-headings :is(.markdown-rendered h1, .markdown-rendered h2,
+    .markdown-rendered h3, .markdown-rendered h4, .markdown-rendered h5,
+    .markdown-rendered h6, .cm-header, .inline-title) {
+    font-family: var(--cc-font-serif);
+    letter-spacing: -0.01em;
+}
+body.claude-mono-headings :is(.markdown-rendered h1, .markdown-rendered h2,
+    .markdown-rendered h3, .markdown-rendered h4, .markdown-rendered h5,
+    .markdown-rendered h6, .cm-header, .inline-title) {
+    font-family: var(--cc-font-mono);
+    letter-spacing: -0.02em;
+}
+
+/* =====================================================================
+   6. CODE  —  the heart of Claude Code
+   ===================================================================== */
+
+/* "Loud code blocks" (Style Settings, on by default): blue frame + text so
+   code stands out. Off → the warm defaults above, in line with the theme. */
+body.cc-loud-code.theme-light {
+    --cc-code-bg:     #eaf1fd;              /* light blue */
+    --cc-code-border: #cadcf3;
+    --cc-code-text:   #11589f;              /* deep azure */
+}
+body.cc-loud-code.theme-dark {
+    --cc-code-bg:     #182234;              /* deep blue */
+    --cc-code-border: #2b3c59;
+    --cc-code-text:   #7db7ff;              /* sky blue */
+}
+
+/* Inline code: pill in the same family as code blocks (consistent) */
+.markdown-rendered code,
+:not(pre) > code {
+    font-family: var(--cc-font-mono);
+    font-size: 0.86em;
+    background-color: var(--cc-code-bg);
+    color: var(--cc-code-text);
+    border: 1px solid var(--cc-code-border);
+    border-radius: var(--radius-s);
+    padding: 0.12em 0.38em;
+}
+
+/* Code blocks: framed card with soft corners */
+.markdown-rendered pre,
+.cm-s-obsidian .HyperMD-codeblock {
+    font-family: var(--cc-font-mono);
+}
+.markdown-rendered pre {
+    position: relative;
+    background-color: var(--cc-code-bg);
+    border: 1px solid var(--cc-code-border);
+    border-radius: var(--cc-radius);
+    padding: 2.5em 1.1em 1em;
+    font-size: 0.85em;
+    line-height: 1.55;
+}
+.markdown-rendered pre > code {
+    background: none;
+    border: none;
+    padding: 0;
+    color: var(--cc-code-text);
+}
+/* Plain (un-highlighted) code text in live preview also reads blue */
+.cm-s-obsidian .HyperMD-codeblock { color: var(--cc-code-text); }
+
+/* Live-preview code block frame */
+.markdown-source-view.mod-cm6 .HyperMD-codeblock-bg {
+    background-color: var(--cc-code-bg);
+}
+.markdown-source-view.mod-cm6 .HyperMD-codeblock {
+    border-left: 1px solid var(--cc-code-border);
+    border-right: 1px solid var(--cc-code-border);
+}
+.markdown-source-view.mod-cm6 .HyperMD-codeblock-begin-bg {
+    border-radius: var(--cc-radius) var(--cc-radius) 0 0;
+    border-top: 1px solid var(--cc-code-border);
+}
+.markdown-source-view.mod-cm6 .HyperMD-codeblock-end-bg {
+    border-radius: 0 0 var(--cc-radius) var(--cc-radius);
+    border-bottom: 1px solid var(--cc-code-border);
+}
+
+/* Code block header — language label (top-left) + copy button (top-right).
+   Applies to every code block so the copy button never overlaps the code. */
+.markdown-rendered pre::before {
+    content: "code";
+    position: absolute;
+    top: 0.7em;
+    left: 1.1em;
+    font-family: var(--cc-font-mono);
+    font-size: 0.72em;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: var(--cc-text-faint);
+}
+.markdown-rendered pre::after {
+    content: "";
+    position: absolute;
+    top: 2.2em; left: 1.1em; right: 1.1em;
+    border-top: 1px solid var(--cc-code-border);
+}
+/* Common language labels */
+.markdown-rendered pre.language-javascript::before, .markdown-rendered pre.language-js::before { content: "javascript"; }
+.markdown-rendered pre.language-typescript::before, .markdown-rendered pre.language-ts::before { content: "typescript"; }
+.markdown-rendered pre.language-jsx::before { content: "jsx"; }
+.markdown-rendered pre.language-tsx::before { content: "tsx"; }
+.markdown-rendered pre.language-python::before, .markdown-rendered pre.language-py::before { content: "python"; }
+.markdown-rendered pre.language-bash::before, .markdown-rendered pre.language-sh::before, .markdown-rendered pre.language-shell::before, .markdown-rendered pre.language-zsh::before { content: "shell"; }
+.markdown-rendered pre.language-json::before { content: "json"; }
+.markdown-rendered pre.language-yaml::before, .markdown-rendered pre.language-yml::before { content: "yaml"; }
+.markdown-rendered pre.language-toml::before { content: "toml"; }
+.markdown-rendered pre.language-html::before, .markdown-rendered pre.language-xml::before { content: "html"; }
+.markdown-rendered pre.language-css::before, .markdown-rendered pre.language-scss::before { content: "css"; }
+.markdown-rendered pre.language-java::before { content: "java"; }
+.markdown-rendered pre.language-c::before { content: "c"; }
+.markdown-rendered pre.language-cpp::before { content: "c++"; }
+.markdown-rendered pre.language-csharp::before, .markdown-rendered pre.language-cs::before { content: "c#"; }
+.markdown-rendered pre.language-go::before { content: "go"; }
+.markdown-rendered pre.language-rust::before, .markdown-rendered pre.language-rs::before { content: "rust"; }
+.markdown-rendered pre.language-ruby::before, .markdown-rendered pre.language-rb::before { content: "ruby"; }
+.markdown-rendered pre.language-php::before { content: "php"; }
+.markdown-rendered pre.language-sql::before { content: "sql"; }
+.markdown-rendered pre.language-markdown::before, .markdown-rendered pre.language-md::before { content: "markdown"; }
+.markdown-rendered pre.language-dockerfile::before { content: "dockerfile"; }
+.markdown-rendered pre.language-kotlin::before { content: "kotlin"; }
+.markdown-rendered pre.language-swift::before { content: "swift"; }
+
+.markdown-rendered button.copy-code-button {
+    top: 0.5em;
+    right: 0.6em;
+    color: var(--cc-text-muted);
+    background-color: var(--cc-bg-alt);
+    border: 1px solid var(--cc-code-border);
+    border-radius: var(--radius-s);
+    padding: 0.2em 0.55em;
+    font-size: 0.74em;
+    opacity: 0;
+    transition: opacity 120ms ease, color 120ms ease;
+}
+.markdown-rendered pre:hover button.copy-code-button { opacity: 1; }
+.markdown-rendered button.copy-code-button:hover { color: var(--text-accent); border-color: var(--text-accent); }
+
+/* Syntax highlighting — a restrained, Claude-warm palette */
+.theme-light {
+    --code-comment:  #9a9684;
+    --code-keyword:  #b0532f;
+    --code-function: #2f6f6a;
+    --code-string:   #5c7a3f;
+    --code-property: #8a5a2b;
+    --code-value:    #355f8a;
+    --code-operator: #6e6a5c;
+    --code-tag:      #b0532f;
+    --code-important: #c15f3c;
+}
+.theme-dark {
+    --code-comment:  #767264;
+    --code-keyword:  #e8916f;
+    --code-function: #7fc4bd;
+    --code-string:   #a7c98a;
+    --code-property: #e0b483;
+    --code-value:    #8fb6e0;
+    --code-operator: #a8a496;
+    --code-tag:      #e8916f;
+    --code-important: #e8a587;
+}
+.token.comment, .token.prolog, .token.doctype, .token.cdata { color: var(--code-comment); font-style: italic; }
+.token.keyword, .token.atrule, .token.rule { color: var(--code-keyword); }
+.token.function, .token.class-name { color: var(--code-function); }
+.token.string, .token.char, .token.attr-value { color: var(--code-string); }
+.token.property, .token.attr-name, .token.symbol { color: var(--code-property); }
+.token.number, .token.boolean, .token.constant, .token.builtin { color: var(--code-value); }
+.token.operator, .token.punctuation, .token.entity { color: var(--code-operator); }
+.token.tag, .token.selector { color: var(--code-tag); }
+.token.important, .token.bold { color: var(--code-important); font-weight: 700; }
+
+/* CodeMirror live-preview tokens follow suit */
+.cm-s-obsidian span.cm-comment { color: var(--code-comment); font-style: italic; }
+.cm-s-obsidian span.cm-keyword { color: var(--code-keyword); }
+.cm-s-obsidian span.cm-def, .cm-s-obsidian span.cm-property { color: var(--code-function); }
+.cm-s-obsidian span.cm-string, .cm-s-obsidian span.cm-string-2 { color: var(--code-string); }
+.cm-s-obsidian span.cm-number, .cm-s-obsidian span.cm-atom { color: var(--code-value); }
+.cm-s-obsidian span.cm-operator { color: var(--code-operator); }
+.cm-s-obsidian span.cm-tag { color: var(--code-tag); }
+
+/* =====================================================================
+   7. BLOCKQUOTES & CALLOUTS
+   ===================================================================== */
+.markdown-rendered blockquote {
+    border-left: 3px solid var(--blockquote-border-color);
+    border-radius: 0 var(--radius-s) var(--radius-s) 0;
+    background-color: color-mix(in srgb, var(--cc-accent) 6%, transparent);
+    padding: 0.5em 1em;
+    color: var(--cc-text-muted);
+    font-style: normal;
+}
+
+/* Callouts — soft warm cards, tinted and titled by their type color */
+.callout {
+    --callout-radius: var(--cc-radius);
+    border-radius: var(--cc-radius);
+    border: 1px solid rgba(var(--callout-color), 0.28);
+    background-color: rgba(var(--callout-color), 0.07);
+    mix-blend-mode: normal;
+    padding: 4px 10px;
+    margin: 1em 0;
+}
+.callout-title {
+    padding: 0.5em 0.4em;
+    font-weight: 700;
+    gap: 0.5em;
+    color: rgb(var(--callout-color));
+}
+.callout-icon .svg-icon { color: rgb(var(--callout-color)); }
+.callout-content { padding: 0 0.4em 0.3em; color: var(--text-normal); }
+.callout { --callout-color: 110, 106, 92; }       /* default (quote/abstract/etc.) */
+.callout[data-callout="note"], .callout[data-callout="info"] { --callout-color: 217, 119, 87; }
+.callout[data-callout="tip"],  .callout[data-callout="success"], .callout[data-callout="done"] { --callout-color: 92, 122, 63; }
+.callout[data-callout="warning"], .callout[data-callout="caution"], .callout[data-callout="attention"] { --callout-color: 200, 140, 50; }
+.callout[data-callout="danger"], .callout[data-callout="error"], .callout[data-callout="bug"], .callout[data-callout="failure"] { --callout-color: 193, 95, 60; }
+.callout[data-callout="question"], .callout[data-callout="help"], .callout[data-callout="faq"] { --callout-color: 154, 110, 60; }
+.callout[data-callout="example"] { --callout-color: 120, 100, 150; }
+
+/* =====================================================================
+   8. LISTS, TASKS, TABLES, HR, TAGS
+   ===================================================================== */
+
+/* Task checkboxes — coral when checked, rounded */
+input[type="checkbox"] {
+    -webkit-appearance: none;
+    appearance: none;
+    border: 1.5px solid var(--cc-text-faint);
+    border-radius: 6px;
+    width: 1.25em; height: 1.25em;
+    position: relative;
+    top: -0.05em;
+    cursor: pointer;
+    transition: background-color 120ms ease, border-color 120ms ease;
+}
+input[type="checkbox"]:hover { border-color: var(--text-accent); }
+input[type="checkbox"]:checked {
+    background-color: var(--interactive-accent);
+    border-color: var(--interactive-accent);
+}
+input[type="checkbox"]:checked::after {
+    content: "";
+    position: absolute;
+    left: 0.42em; top: 0.18em;
+    width: 0.26em; height: 0.52em;
+    border: solid var(--text-on-accent);
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg);
+}
+.markdown-rendered li.task-list-item[data-task="x"] .task-list-item-checkbox + *,
+.markdown-rendered li.task-list-item[data-task="X"] .task-list-item-checkbox + * {
+    color: var(--cc-text-faint);
+    text-decoration: line-through;
+}
+
+/* List bullets: orange marker, normal-colored text */
+.markdown-rendered ul > li::marker { color: var(--interactive-accent); }
+.markdown-rendered ol > li::marker { color: var(--cc-text-muted); }
+/* Live-preview bullets */
+.markdown-source-view.mod-cm6 .cm-formatting-list-ul,
+.markdown-source-view.mod-cm6 .HyperMD-list-line .list-bullet::after {
+    color: var(--interactive-accent);
+}
+.markdown-source-view.mod-cm6 .list-bullet { color: var(--interactive-accent); }
+
+/* Tables — light-orange body, more-orange header, visible orange grid lines */
+.markdown-rendered table {
+    border-collapse: collapse;
+    width: 100%;
+    background-color: var(--cc-table-bg);
+    border: 1px solid var(--cc-table-border);
+    border-radius: var(--cc-radius);
+    overflow: hidden;
+}
+.markdown-rendered thead tr,
+.markdown-rendered th {
+    background-color: var(--cc-table-header);
+}
+.markdown-rendered th {
+    color: var(--cc-heading);
+    font-weight: 700;
+    text-align: left;
+    border: 1px solid var(--cc-table-border);
+    border-bottom-width: 2px;
+    padding: 0.55em 0.85em;
+}
+.markdown-rendered td {
+    background: transparent;
+    border: 1px solid var(--cc-table-border);
+    padding: 0.55em 0.85em;
+    vertical-align: top;
+}
+.markdown-rendered tbody tr:hover td { background-color: color-mix(in srgb, var(--cc-accent) 5%, transparent); }
+
+/* Horizontal rule — slim and soft */
+.markdown-rendered hr {
+    border: none;
+    border-top: 1px solid var(--hr-color);
+    margin: 2em 0;
+}
+
+/* Tags — coral pills */
+.markdown-rendered a.tag,
+.cm-s-obsidian .cm-hashtag {
+    color: var(--tag-color);
+    background-color: var(--tag-background);
+    border: none;
+    border-radius: 999px;
+    padding: 0.1em 0.6em;
+    font-size: 0.82em;
+    font-weight: 500;
+    text-decoration: none;
+}
+.markdown-rendered a.tag:hover { background-color: var(--tag-background-hover); }
+
+/* Highlights / ==marks== */
+.markdown-rendered mark, .cm-highlight {
+    background-color: var(--text-highlight-bg);
+    color: var(--text-normal);
+    border-radius: 3px;
+    padding: 0 0.1em;
+}
+
+/* =====================================================================
+   9. CHROME  —  sidebar, tabs, titlebar, inputs, scrollbars
+   ===================================================================== */
+.workspace-tab-header.is-active {
+    --tab-text-color-focused-active: var(--cc-heading);
+}
+.workspace-tab-header.is-active .workspace-tab-header-inner-title { font-weight: 600; }
+
+/* File explorer hierarchy: bold folders, medium files (same font) */
+.workspace-leaf-content[data-type="file-explorer"] .nav-folder-title-content {
+    font-weight: var(--cc-folder-weight);
+    color: var(--cc-heading);
+}
+.workspace-leaf-content[data-type="file-explorer"] .nav-file-title-content {
+    font-weight: var(--cc-file-weight);
+}
+
+/* Active file/folder in the explorer: compact rounded rectangle with a
+   flush, full-height coral spine (matches the spine's height, not a tall pill) */
+.tree-item-self { position: relative; --nav-item-border-radius: 6px; }
+.nav-file-title.is-active,
+.nav-folder-title.is-active,
+.tree-item-self.is-active,
+.tree-item-self.is-active.has-focus,
+.tree-item-self.has-focus {
+    background-color: var(--cc-selection);
+    color: var(--cc-heading);
+    border-radius: 6px;
+}
+.tree-item-self.is-active::before {
+    content: "";
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 3px;
+    border-radius: 6px 0 0 6px;
+    background-color: var(--interactive-accent);
+}
+
+/* Inputs / search */
+input[type="text"], input[type="search"], textarea, .prompt-input {
+    border-radius: var(--radius-m) !important;
+    background-color: var(--background-modifier-form-field);
+    border: 1px solid var(--cc-border);
+}
+input[type="text"]:focus, input[type="search"]:focus, textarea:focus {
+    border-color: var(--interactive-accent);
+    box-shadow: 0 0 0 2px var(--cc-selection);
+}
+
+/* Properties / frontmatter — sit flat on the page, no out-of-place boxes.
+   (Overrides the global input styling above for metadata fields.) */
+.metadata-container {
+    background: transparent;
+    border: none;
+    padding: 0.4em 0;
+}
+.metadata-properties-heading { border: none; padding-left: 0; }
+.metadata-content { padding: 0; }
+.metadata-property {
+    background: transparent;
+    border-radius: var(--radius-s);
+}
+.metadata-property:hover { background: var(--background-modifier-hover); }
+.metadata-property-key-input,
+.metadata-property-key-input:hover,
+.metadata-property-key-input:focus,
+.metadata-property-value input[type="text"],
+.metadata-property-value input[type="text"]:hover,
+.metadata-property-value input[type="text"]:focus,
+.metadata-property-value .metadata-input-longtext {
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    border-radius: var(--radius-s) !important;
+}
+.metadata-property-key { color: var(--cc-text-muted); }
+.metadata-property-icon { color: var(--cc-text-faint); }
+.metadata-add-button { color: var(--cc-text-muted); }
+
+/* Buttons */
+button:not(.clickable-icon),
+.mod-cta {
+    border-radius: var(--radius-m);
+}
+button.mod-cta { font-weight: 600; }
+
+/* Command palette & suggestion menus — soft cards */
+.suggestion-container, .prompt {
+    border-radius: var(--cc-radius);
+    border: 1px solid var(--cc-border);
+}
+.suggestion-item.is-selected { background-color: var(--cc-selection); }
+
+/* Graph view in theme colors */
+.graph-view.color-fill { color: var(--cc-accent-bright); }
+.graph-view.color-line { color: var(--cc-border); }
+.graph-view.color-text { color: var(--cc-text-muted); }
+.graph-view.color-circle { color: var(--cc-accent-bright); }
+
+/* Scrollbars stay quiet */
+::-webkit-scrollbar-thumb { border-radius: 999px; }
+
+/* Status bar / breadcrumbs */
+.status-bar { background-color: var(--cc-bg-alt); border-top: 1px solid var(--cc-border); }
+
+/* Embedded images & embeds — soft rounded corners */
+.markdown-rendered img,
+.markdown-rendered .image-embed img,
+.markdown-rendered video {
+    border-radius: var(--radius-m);
+}
+.markdown-rendered .internal-embed.markdown-embed {
+    border-radius: var(--cc-radius);
+    border: 1px solid var(--cc-border);
+    background-color: var(--cc-bg-alt);
+    padding: 0.2em 0.8em;
+}
+
+/* Mobile toolbar & navbar — match the theme chrome */
+.is-mobile .mobile-toolbar,
+.is-mobile .mobile-navbar {
+    background-color: var(--cc-bg-alt);
+    border-top: 1px solid var(--cc-border);
+}
+.is-mobile .mobile-toolbar-option:active { color: var(--text-accent); }
+
+/* Selection */
+::selection { background-color: var(--text-selection); }

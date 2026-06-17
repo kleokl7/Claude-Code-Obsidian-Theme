@@ -767,37 +767,23 @@ body.cc-loud-code.theme-dark {
    8. LISTS, TASKS, TABLES, HR, TAGS
    ===================================================================== */
 
-/* Task checkboxes — coral when checked, rounded */
-input[type="checkbox"] {
-    -webkit-appearance: none;
-    appearance: none;
-    border: 1.5px solid var(--cc-text-faint);
-    border-radius: 6px;
-    width: 1.25em; height: 1.25em;
-    position: relative;
-    top: -0.05em;
-    cursor: pointer;
-    transition: background-color 120ms ease, border-color 120ms ease;
-}
-input[type="checkbox"]:hover { border-color: var(--text-accent); }
-input[type="checkbox"]:checked {
-    background-color: var(--interactive-accent);
-    border-color: var(--interactive-accent);
-}
-/* Checked state: a crisp white tick (✓) — reads as "done" */
-input[type="checkbox"]:checked::after {
-    content: "";
-    position: absolute;
-    left: 0.44em; top: 0.15em;
-    width: 0.3em; height: 0.56em;
-    border: solid #ffffff;
-    border-width: 0 2.5px 2.5px 0;
-    transform: rotate(45deg);
-}
-.markdown-rendered li.task-list-item[data-task="x"] .task-list-item-checkbox + *,
-.markdown-rendered li.task-list-item[data-task="X"] .task-list-item-checkbox + * {
-    color: var(--cc-text-faint);
-    text-decoration: line-through;
+/* Task checkboxes — coral box with a white tick when done.
+   Driven through Obsidian's own checkbox variables rather than a custom
+   appearance reset + ::after tick. Obsidian draws the check (colored by
+   --checkbox-marker-color) on the same code path it uses on mobile, so the
+   white tick actually shows there instead of the native dark glyph. These
+   variables also style completed-task text in both reading view and Live
+   Preview, so no separate strikethrough rules are needed. */
+body {
+    --checkbox-size: 1.5em;
+    --checkbox-radius: 0.4em;
+    --checkbox-marker-color: #ffffff;
+    --checkbox-color: var(--interactive-accent);
+    --checkbox-color-hover: var(--interactive-accent);
+    --checkbox-border-color: var(--cc-text-faint);
+    --checkbox-border-color-hover: var(--text-accent);
+    --checklist-done-color: var(--cc-text-faint);
+    --checklist-done-decoration: line-through;
 }
 
 /* List bullets: orange marker, normal-colored text */

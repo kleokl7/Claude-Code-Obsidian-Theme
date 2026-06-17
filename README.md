@@ -7,6 +7,13 @@ A faithful recreation of the look and feel of **Claude Code in the Claude mobile
 | Warm "Pampas" cream `#faf9f5` | Warm charcoal `#262624` |
 | Coral links `#c15f3c` | Coral links `#e8916f` |
 
+# Preview
+<img width="2543" height="1390" alt="image" src="https://github.com/user-attachments/assets/a1802f4c-2377-4f4c-91f1-b1a2f1eb215f" />
+<img width="194" height="425" alt="image" src="https://github.com/user-attachments/assets/38e36cd0-8893-45f5-b84a-f8b9104bd9ea" />
+<img width="722" height="780" alt="image" src="https://github.com/user-attachments/assets/92004a39-6e18-4ef1-a232-0d8402d773ff" />
+<img width="711" height="470" alt="image" src="https://github.com/user-attachments/assets/b82b6fe3-3e67-414c-96db-0db71b64d471" />
+
+
 ## What it recreates
 
 - **Color** — Claude's warm neutral backgrounds (no cold grays), the coral accent (`#d97757` / Crail `#c15f3c`) driving links, the active note marker, tags, checkboxes and highlights.

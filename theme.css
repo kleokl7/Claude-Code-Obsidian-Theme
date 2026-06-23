@@ -786,6 +786,81 @@ body {
     --checklist-done-decoration: line-through;
 }
 
+/* In-progress task `- [/]` — a half-filled coral box, no tick.
+   The diagonal fill echoes the slash you type and reads instantly as
+   "started, not finished": clearly distinct from the empty box and from
+   the ticked done box, while staying in the coral family. Drawn with an
+   explicit appearance reset (prefixed + unprefixed) so the custom fill
+   shows on mobile too, where Obsidian otherwise falls back to a native
+   glyph. Custom data-task states aren't "done", so the text stays normal. */
+.markdown-rendered input.task-list-item-checkbox[data-task="/"],
+.markdown-source-view.mod-cm6 input.task-list-item-checkbox[data-task="/"] {
+    -webkit-appearance: none;
+    appearance: none;
+    border: 1.5px solid var(--interactive-accent);
+    background-color: var(--background-primary);
+    background-image: linear-gradient(135deg,
+        var(--interactive-accent) 0 50%,
+        transparent 50%);
+}
+/* Suppress Obsidian's native tick for the in-progress state */
+.markdown-rendered input.task-list-item-checkbox[data-task="/"]::after,
+.markdown-source-view.mod-cm6 input.task-list-item-checkbox[data-task="/"]::after {
+    display: none;
+}
+
+/* Cancelled task `- [-]` — muted box with a centered dash and struck-through,
+   faded text. Deliberately greyscale (no coral) so it reads as "dropped",
+   never as "done". Obsidian only strikes x/X items, so the text styling here
+   is applied by hand. */
+.markdown-rendered input.task-list-item-checkbox[data-task="-"],
+.markdown-source-view.mod-cm6 input.task-list-item-checkbox[data-task="-"] {
+    -webkit-appearance: none;
+    appearance: none;
+    border: 1.5px solid var(--cc-text-faint);
+    background-color: var(--background-primary);
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: 55% 100%;
+    background-image: linear-gradient(to bottom,
+        transparent 0 44%,
+        var(--cc-text-muted) 44% 56%,
+        transparent 56%);
+}
+.markdown-rendered input.task-list-item-checkbox[data-task="-"]::after,
+.markdown-source-view.mod-cm6 input.task-list-item-checkbox[data-task="-"]::after {
+    display: none;
+}
+.markdown-rendered .task-list-item[data-task="-"],
+.markdown-source-view.mod-cm6 .HyperMD-task-line[data-task="-"] {
+    color: var(--cc-text-faint);
+    text-decoration: line-through;
+}
+
+/* Forwarded / scheduled task `- [>]` — a coral right-chevron in a coral box.
+   Text stays normal: the task isn't finished, just deferred to another day.
+   The chevron is a background-image SVG (not a mask) so it renders on mobile;
+   the coral is baked per-theme since background images can't read CSS vars. */
+.markdown-rendered input.task-list-item-checkbox[data-task=">"],
+.markdown-source-view.mod-cm6 input.task-list-item-checkbox[data-task=">"] {
+    -webkit-appearance: none;
+    appearance: none;
+    border: 1.5px solid var(--interactive-accent);
+    background-color: var(--background-primary);
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: 60%;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23c15f3c' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='9 5 16 12 9 19'/%3E%3C/svg%3E");
+}
+.theme-dark .markdown-rendered input.task-list-item-checkbox[data-task=">"],
+.theme-dark .markdown-source-view.mod-cm6 input.task-list-item-checkbox[data-task=">"] {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23d97757' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='9 5 16 12 9 19'/%3E%3C/svg%3E");
+}
+.markdown-rendered input.task-list-item-checkbox[data-task=">"]::after,
+.markdown-source-view.mod-cm6 input.task-list-item-checkbox[data-task=">"]::after {
+    display: none;
+}
+
 /* List bullets: orange marker, normal-colored text */
 .markdown-rendered ul > li::marker { color: var(--interactive-accent); }
 .markdown-rendered ol > li::marker { color: var(--cc-text-muted); }

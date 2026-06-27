@@ -265,7 +265,7 @@ body {
 
     --titlebar-background:        var(--cc-bg-alt);
     --titlebar-background-focused:var(--cc-bg-alt);
-    --tab-background-active:      var(--cc-bg);
+    --tab-background-active:      color-mix(in srgb, var(--cc-accent) 16%, var(--cc-bg));
 
     --quote-opacity: 1;
     --hr-color: var(--cc-border);
@@ -358,7 +358,7 @@ body {
 
     --titlebar-background:        var(--cc-bg-alt);
     --titlebar-background-focused:var(--cc-bg-alt);
-    --tab-background-active:      var(--cc-bg);
+    --tab-background-active:      color-mix(in srgb, var(--cc-accent) 16%, var(--cc-bg));
 
     --quote-opacity: 1;
     --hr-color: var(--cc-border);
@@ -907,7 +907,12 @@ body {
     margin: 2em 0;
 }
 
-/* Tags — coral pills */
+/* Tags — coral pills.
+   In Live Preview a tag is split into two spans (a `#` span + the text span),
+   so giving each a full rounded pill drew them as two capsules with a gap.
+   Keep the shared fill, but below we round only the OUTER corners and drop the
+   inner padding so `#tag` reads as one seamless pill. Reading view (`a.tag`)
+   is already a single element. */
 .markdown-rendered a.tag,
 .cm-s-obsidian .cm-hashtag {
     color: var(--tag-color);
@@ -920,6 +925,15 @@ body {
     text-decoration: none;
 }
 .markdown-rendered a.tag:hover { background-color: var(--tag-background-hover); }
+/* Live Preview: weld the split #/text spans into a single continuous pill */
+.cm-s-obsidian .cm-hashtag-begin {
+    border-radius: 999px 0 0 999px;
+    padding-right: 0;
+}
+.cm-s-obsidian .cm-hashtag-end {
+    border-radius: 0 999px 999px 0;
+    padding-left: 0;
+}
 
 /* Highlights / ==marks== */
 .markdown-rendered mark, .cm-highlight {
@@ -932,6 +946,14 @@ body {
 /* =====================================================================
    9. CHROME  —  sidebar, tabs, titlebar, inputs, scrollbars
    ===================================================================== */
+/* Tabs — idle tabs sit muted; the active tab gets a soft coral-tinted fill,
+   set through Obsidian's own --tab-background-active variable (in the palette
+   blocks above). A background fills the whole tab regardless of its internal
+   structure, so it's robust where a wrapper underline kept missing the close-
+   button area. Plus bold, heading-colored text; inactive tabs brighten on
+   hover. */
+body { --tab-text-color: var(--cc-text-muted); }
+.workspace-tab-header:hover { --tab-text-color: var(--cc-text); }
 .workspace-tab-header.is-active {
     --tab-text-color-focused-active: var(--cc-heading);
 }

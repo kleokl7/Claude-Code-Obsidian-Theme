@@ -4,44 +4,8 @@ A faithful recreation of the look and feel of **Claude Code in the Claude mobile
 
 | Light | Dark |
 | --- | --- |
-| Warm "Pampas" cream `#faf9f5` | Warm charcoal `#262624` |
-| Coral links `#c15f3c` | Coral links `#e8916f` |
-
-## Preview
-
-### Light
-
-<p align="center">
-  <img height="330" src="https://github.com/user-attachments/assets/a1802f4c-2377-4f4c-91f1-b1a2f1eb215f" />
-  <img height="330" src="https://github.com/user-attachments/assets/92004a39-6e18-4ef1-a232-0d8402d773ff" />
-</p>
-
-<p align="center">
-  <img height="320" src="https://github.com/user-attachments/assets/b82b6fe3-3e67-414c-96db-0db71b64d471" />
-  <img height="320" src="https://github.com/user-attachments/assets/38e36cd0-8893-45f5-b84a-f8b9104bd9ea" />
-</p>
-
-<p align="center">
-  <img height="120" src="https://github.com/user-attachments/assets/55326529-c37d-40e5-8550-24cc757ff865" />
-  <img height="120" src="https://github.com/user-attachments/assets/5daeeff2-4232-483a-8963-1b4bbe7f6935" />
-</p>
-
-### Dark
-
-<p align="center">
-  <img width="100%" src="https://github.com/user-attachments/assets/9f6c707f-6fc1-4b8b-b4eb-3ac8835a8d81" />
-</p>
-
-<p align="center">
-  <img height="330" src="https://github.com/user-attachments/assets/d00fa038-520e-4a78-98cf-eeb1a9330ebe" />
-  <img height="330" src="https://github.com/user-attachments/assets/d5909380-e4c4-4bdf-9e08-03fbb449fcf4" />
-</p>
-
-<p align="center">
-  <img height="140" src="https://github.com/user-attachments/assets/28bbe00f-992c-4029-8c52-4ac46e7cc517" />
-  <img height="140" src="https://github.com/user-attachments/assets/749649ad-b10e-4043-8b14-dce6241bf2b9" />
-</p>
-
+| Warm paper cream `#f9f3e7` | Warm charcoal `#262624` |
+| Coral links `#b0532f` | Coral links `#e8916f` |
 
 ## What it recreates
 
@@ -51,6 +15,20 @@ A faithful recreation of the look and feel of **Claude Code in the Claude mobile
 - **Links** — coral, underlined with a soft offset; brighten on hover.
 - **Code** — framed code cards with soft corners, pill-shaped inline code, and a restrained, warm syntax palette tuned to the Claude aesthetic.
 - **Everything else** — callouts, tables, blockquotes, task lists, the file explorer, command palette, inputs and graph view all follow the same language.
+
+## Task states
+
+Beyond the standard empty and done checkboxes, the theme styles three extra task markers so a list shows real progress at a glance. Type the character between the brackets — e.g. `- [/] Draft the intro`:
+
+| Marker | Looks like | Meaning |
+| --- | --- | --- |
+| `- [ ]` | empty outlined box | to do |
+| `- [/]` | half-filled coral box, split on the diagonal | in progress |
+| `- [>]` | coral right-chevron | forwarded / scheduled for another day |
+| `- [x]` | filled coral box with a white tick | done — text struck through |
+| `- [-]` | muted box with a dash | cancelled — text struck through and faded |
+
+Works in both reading view and Live Preview, on desktop and mobile.
 
 ## Fonts
 
@@ -95,5 +73,43 @@ Install the community plugin **[Style Settings](https://github.com/mgmeyers/obsi
 All defaults match the Claude Code look, so the theme looks right with the plugin not installed too.
 
 ## License
+
+MIT. Not affiliated with or endorsed by Anthropic. "Claude" and "Claude Code" are trademarks of Anthropic; this is a community theme that imitates the aesthetic using free, redistributable fonts.
+
+## Preview
+
+### Light
+
+<p align="center">
+  <img height="330" src="https://github.com/user-attachments/assets/a1802f4c-2377-4f4c-91f1-b1a2f1eb215f" />
+  <img height="330" src="https://github.com/user-attachments/assets/92004a39-6e18-4ef1-a232-0d8402d773ff" />
+</p>
+
+<p align="center">
+  <img height="320" src="https://github.com/user-attachments/assets/b82b6fe3-3e67-414c-96db-0db71b64d471" />
+  <img height="320" src="https://github.com/user-attachments/assets/38e36cd0-8893-45f5-b84a-f8b9104bd9ea" />
+</p>
+
+<p align="center">
+  <img height="120" src="https://github.com/user-attachments/assets/55326529-c37d-40e5-8550-24cc757ff865" />
+  <img height="120" src="https://github.com/user-attachments/assets/5daeeff2-4232-483a-8963-1b4bbe7f6935" />
+</p>
+
+### Dark
+
+<p align="center">
+  <img width="100%" src="https://github.com/user-attachments/assets/9f6c707f-6fc1-4b8b-b4eb-3ac8835a8d81" />
+</p>
+
+<p align="center">
+  <img height="330" src="https://github.com/user-attachments/assets/d00fa038-520e-4a78-98cf-eeb1a9330ebe" />
+  <img height="330" src="https://github.com/user-attachments/assets/d5909380-e4c4-4bdf-9e08-03fbb449fcf4" />
+</p>
+
+<p align="center">
+  <img height="140" src="https://github.com/user-attachments/assets/28bbe00f-992c-4029-8c52-4ac46e7cc517" />
+  <img height="140" src="https://github.com/user-attachments/assets/749649ad-b10e-4043-8b14-dce6241bf2b9" />
+</p>
+
 
 MIT. Not affiliated with or endorsed by Anthropic. "Claude" and "Claude Code" are trademarks of Anthropic; this is a community theme that imitates the aesthetic using free, redistributable fonts.

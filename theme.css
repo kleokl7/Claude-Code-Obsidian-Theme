@@ -281,7 +281,7 @@ body {
     --cc-code-bg:     #f0e8d6;              /* warm parchment inset */
     --cc-code-border: #e1d5bd;
     --cc-code-text:   #5c4f3b;              /* warm code text */
-    --code-background: var(--cc-bg-deep);
+    --code-background: var(--cc-code-bg);
     --code-normal: var(--cc-code-text);
 
     --list-marker-color: var(--cc-accent-light);  /* orange bullets */
@@ -374,7 +374,7 @@ body {
     --cc-code-bg:     #1f1b15;              /* warm dark inset */
     --cc-code-border: #382f23;
     --cc-code-text:   #d8cbb3;              /* warm code text */
-    --code-background: var(--cc-bg-deep);
+    --code-background: var(--cc-code-bg);
     --code-normal: var(--cc-code-text);
 
     --list-marker-color: var(--cc-accent-dark);   /* orange bullets */
@@ -581,6 +581,17 @@ body.cc-loud-code.theme-dark {
     border-radius: var(--radius-s);
     padding: 0.12em 0.38em;
 }
+/* Live Preview inline code is a `.cm-inline-code` span, not a <code> element —
+   give it the same face and colors. No border or horizontal padding: the text
+   can split across several spans (backticks, cursor edits), and per-span
+   borders/padding would draw seams mid-pill. */
+.cm-s-obsidian span.cm-inline-code {
+    font-family: var(--cc-font-mono);
+    font-size: 0.86em;
+    background-color: var(--cc-code-bg);
+    color: var(--cc-code-text);
+    border-radius: var(--radius-s);
+}
 
 /* Code blocks: framed card with soft corners */
 .markdown-rendered pre,
@@ -667,6 +678,11 @@ body.cc-loud-code.theme-dark {
 .markdown-rendered pre.language-dockerfile::before { content: "dockerfile"; }
 .markdown-rendered pre.language-kotlin::before { content: "kotlin"; }
 .markdown-rendered pre.language-swift::before { content: "swift"; }
+.markdown-rendered pre.language-diff::before { content: "diff"; }
+.markdown-rendered pre.language-ini::before { content: "ini"; }
+.markdown-rendered pre.language-lua::before { content: "lua"; }
+.markdown-rendered pre.language-powershell::before, .markdown-rendered pre.language-ps1::before { content: "powershell"; }
+.markdown-rendered pre.language-text::before, .markdown-rendered pre.language-plaintext::before, .markdown-rendered pre.language-txt::before { content: "text"; }
 
 .markdown-rendered button.copy-code-button {
     top: 0.5em;
@@ -680,8 +696,13 @@ body.cc-loud-code.theme-dark {
     opacity: 0;
     transition: opacity 120ms ease, color 120ms ease;
 }
-.markdown-rendered pre:hover button.copy-code-button { opacity: 1; }
+.markdown-rendered pre:hover button.copy-code-button,
+.markdown-rendered button.copy-code-button:focus-visible { opacity: 1; }
 .markdown-rendered button.copy-code-button:hover { color: var(--text-accent); border-color: var(--text-accent); }
+/* Touch screens have no hover — keep the copy button always visible there */
+@media (hover: none) {
+    .markdown-rendered button.copy-code-button { opacity: 1; }
+}
 
 /* Syntax highlighting — a restrained, Claude-warm palette */
 .theme-light {
@@ -755,13 +776,25 @@ body.cc-loud-code.theme-dark {
 }
 .callout-icon .svg-icon { color: rgb(var(--callout-color)); }
 .callout-content { padding: 0 0.4em 0.3em; color: var(--text-normal); }
+/* Callout type colors. Two sets: titles sit directly on the note background,
+   so light mode wants deep shades (readable on cream) and dark mode wants
+   lifted ones (readable on charcoal) — one shared set fails contrast on one
+   side or the other. All pairs reach ~4:1+ on their surface. */
 .callout { --callout-color: 110, 106, 92; }       /* default (quote/abstract/etc.) */
-.callout[data-callout="note"], .callout[data-callout="info"] { --callout-color: 217, 119, 87; }
+.callout[data-callout="note"], .callout[data-callout="info"] { --callout-color: 193, 95, 60; }
 .callout[data-callout="tip"],  .callout[data-callout="success"], .callout[data-callout="done"] { --callout-color: 92, 122, 63; }
-.callout[data-callout="warning"], .callout[data-callout="caution"], .callout[data-callout="attention"] { --callout-color: 200, 140, 50; }
-.callout[data-callout="danger"], .callout[data-callout="error"], .callout[data-callout="bug"], .callout[data-callout="failure"] { --callout-color: 193, 95, 60; }
+.callout[data-callout="warning"], .callout[data-callout="caution"], .callout[data-callout="attention"] { --callout-color: 166, 106, 20; }
+.callout[data-callout="danger"], .callout[data-callout="error"], .callout[data-callout="bug"], .callout[data-callout="failure"] { --callout-color: 178, 56, 44; }
 .callout[data-callout="question"], .callout[data-callout="help"], .callout[data-callout="faq"] { --callout-color: 154, 110, 60; }
 .callout[data-callout="example"] { --callout-color: 120, 100, 150; }
+
+.theme-dark .callout { --callout-color: 168, 164, 150; }
+.theme-dark .callout[data-callout="note"], .theme-dark .callout[data-callout="info"] { --callout-color: 232, 145, 111; }
+.theme-dark .callout[data-callout="tip"], .theme-dark .callout[data-callout="success"], .theme-dark .callout[data-callout="done"] { --callout-color: 143, 182, 107; }
+.theme-dark .callout[data-callout="warning"], .theme-dark .callout[data-callout="caution"], .theme-dark .callout[data-callout="attention"] { --callout-color: 224, 169, 90; }
+.theme-dark .callout[data-callout="danger"], .theme-dark .callout[data-callout="error"], .theme-dark .callout[data-callout="bug"], .theme-dark .callout[data-callout="failure"] { --callout-color: 230, 116, 94; }
+.theme-dark .callout[data-callout="question"], .theme-dark .callout[data-callout="help"], .theme-dark .callout[data-callout="faq"] { --callout-color: 212, 169, 122; }
+.theme-dark .callout[data-callout="example"] { --callout-color: 178, 158, 208; }
 
 /* =====================================================================
    8. LISTS, TASKS, TABLES, HR, TAGS
@@ -871,9 +904,14 @@ body {
 }
 .markdown-source-view.mod-cm6 .list-bullet { color: var(--interactive-accent); }
 
-/* Tables — light-orange body, more-orange header, visible orange grid lines */
+/* Tables — light-orange body, more-orange header, visible orange grid lines.
+   border-collapse stays `separate`: Chromium ignores border-radius on
+   collapsed tables, which squares off the card corners. Grid lines are drawn
+   as right/bottom borders per cell (dropped on the last column/row) so they
+   still read as single 1px lines against the table's own outer border. */
 .markdown-rendered table {
-    border-collapse: collapse;
+    border-collapse: separate;
+    border-spacing: 0;
     width: 100%;
     background-color: var(--cc-table-bg);
     border: 1px solid var(--cc-table-border);
@@ -884,18 +922,24 @@ body {
 .markdown-rendered th {
     background-color: var(--cc-table-header);
 }
+.markdown-rendered th,
+.markdown-rendered td {
+    border: none;
+    border-right: 1px solid var(--cc-table-border);
+    border-bottom: 1px solid var(--cc-table-border);
+    padding: 0.55em 0.85em;
+}
+.markdown-rendered th:last-child,
+.markdown-rendered td:last-child { border-right: none; }
+.markdown-rendered tbody tr:last-child > td { border-bottom: none; }
 .markdown-rendered th {
     color: var(--cc-heading);
     font-weight: 700;
     text-align: left;
-    border: 1px solid var(--cc-table-border);
     border-bottom-width: 2px;
-    padding: 0.55em 0.85em;
 }
 .markdown-rendered td {
     background: transparent;
-    border: 1px solid var(--cc-table-border);
-    padding: 0.55em 0.85em;
     vertical-align: top;
 }
 .markdown-rendered tbody tr:hover td { background-color: color-mix(in srgb, var(--cc-accent) 5%, transparent); }
@@ -933,14 +977,6 @@ body {
 .cm-s-obsidian .cm-hashtag-end {
     border-radius: 0 999px 999px 0;
     padding-left: 0;
-}
-
-/* Highlights / ==marks== */
-.markdown-rendered mark, .cm-highlight {
-    background-color: var(--text-highlight-bg);
-    color: var(--text-normal);
-    border-radius: 3px;
-    padding: 0 0.1em;
 }
 
 /* =====================================================================

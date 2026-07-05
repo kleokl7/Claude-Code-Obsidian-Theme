@@ -1,0 +1,55 @@
+/* Claude Scroll Map — structural baseline only.
+   The Claude Code theme restyles all of this (colors, sizes, tooltip);
+   these rules just keep the plugin usable with any theme. */
+
+.cc-scroll-map {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 10px;
+  z-index: 10;
+}
+/* Mobile is progress-bar-only — the plugin doesn't even load there, this
+   is just a belt-and-braces guard for synced DOM/state. */
+body.is-mobile .cc-scroll-map {
+  display: none;
+}
+
+.cc-scroll-dot {
+  position: absolute;
+  top: -1px;
+  transform: translateX(-50%);
+  width: 5px;
+  height: 5px;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  background: var(--text-faint);
+  cursor: pointer;
+}
+.cc-scroll-dot[data-level="1"] { width: 7px; height: 7px; }
+.cc-scroll-dot[data-level="3"] { width: 4px; height: 4px; }
+
+.cc-scroll-dot::after {
+  content: attr(data-label);
+  position: absolute;
+  top: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: none;
+  max-width: 32ch;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: calc(var(--font-text-size, 16px) * 0.6);
+  color: var(--text-normal);
+  background: var(--background-secondary);
+  border: 1px solid var(--background-modifier-border);
+  border-radius: 6px;
+  padding: 2px 8px;
+}
+.cc-scroll-dot:hover::after,
+.cc-scroll-dot.cc-hovered::after {
+  display: block;
+}

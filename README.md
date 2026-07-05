@@ -30,6 +30,21 @@ Beyond the standard empty and done checkboxes, the theme styles three extra task
 
 Works in both reading view and Live Preview, on desktop and mobile.
 
+## Navigation — breadcrumb, progress bar & scroll map
+
+Three layers that answer *where am I* and *how far along am I* in long notes:
+
+<p align="center">
+  <img width="100%" src="screenshots/scroll-map-dark.png" />
+  <img width="100%" src="screenshots/scroll-map-light.png" />
+</p>
+
+- **Heading breadcrumb in the title bar** — with the community plugin [Another Sticky Headings](https://github.com/zhouhua/obsidian-sticky-headings) installed, scrolling into a section replaces the note title with a clickable trail: the page name in coral, then the headings above your position (`Page › Section › Subsection`). Scroll back to the top and the plain title returns. Desktop only — on mobile the plugin keeps its regular stacked view. Toggle under *Style Settings → Plugins*.
+- **Scroll progress bar** — a thin coral fill at the seam under the title row tracks your position as you read. Pure CSS (scroll-driven animation), spans the editor and resizes with the sidebars. On mobile it pins to the bottom of the editor area instead. Toggle under *Style Settings → Editor*.
+- **Heading dots (Claude Scroll Map)** — a tiny companion plugin in [`companion/claude-scroll-map`](companion/claude-scroll-map) drops a dot on the bar for every heading, sized by level (H1 > H2 > H3). Hover a dot for the heading name, hover anywhere on the bar for the section you'd land in, click to jump. Overlapping dots merge automatically. Desktop only — mobile stays progress-bar-only. Install by copying the folder to `<vault>/.obsidian/plugins/claude-scroll-map/` and enabling it in *Settings → Community plugins*.
+
+Each layer works without the others: theme alone gives you the progress bar; add either plugin for its part.
+
 ## Fonts
 
 Claude's real typefaces (**Styrene B**, **Tiempos Text**, **Galaxie Copernicus**) are commercial and can't be bundled, so the theme loads close, free Google Fonts automatically:
@@ -66,9 +81,13 @@ Install the community plugin **[Style Settings](https://github.com/mgmeyers/obsi
 - **Serif reading mode** — switch note body text to the Tiempos-style serif.
 - **Serif headings** / **Monospace headings** — restyle headings.
 - **Body font size**, **line height**, **readable line length** sliders.
+- **Limit line length** — cap note width at a readable measure even with Obsidian's own "Readable line length" off.
 - **Accent color** pickers for light and dark mode.
+- **Dark mode tuning** — live dials for dark-mode reading comfort: **text brightness**, **text weight** (variable-font aware), and **background darkness** (deepens all dark surfaces together).
 - **Loud code blocks** — on (default) gives code blocks a blue frame so they stand out; off keeps them warm, in line with the coral theme.
 - **Highlight active line** — a very light tint behind the editor row your cursor is on (on by default).
+- **Scroll progress bar** — the coral reading-position bar (on by default).
+- **Sticky headings in the title bar** — the breadcrumb integration described above (on by default; inert without the plugin).
 
 All defaults match the Claude Code look, so the theme looks right with the plugin not installed too.
 

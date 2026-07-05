@@ -58,20 +58,26 @@ settings:
         title: Line height
         description: Body line height.
         type: variable-number-slider
-        default: 1.6
+        default: 1.7
         min: 1.2
         max: 2
         step: 0.05
     -
         id: cc-line-width
         title: Readable line length (rem)
-        description: Maximum width of text in the editor when "Readable line length" is on.
+        description: Maximum width of note text when a line-length limit is active (Obsidian's "Readable line length" or the toggle below).
         type: variable-number-slider
         default: 42
         min: 30
         max: 60
         step: 1
         format: rem
+    -
+        id: cc-force-line-width
+        title: Limit line length
+        description: Keep note text at a readable width even when Obsidian's "Readable line length" setting is off.
+        type: class-toggle
+        default: false
     -
         id: cc-nav-font-size
         title: File & folder name size (px)
@@ -178,7 +184,9 @@ body {
 
     /* --- Sizing (Style-Settings driven) --- */
     --cc-body-font-size: 18px;
-    --cc-line-height: 1.6;
+    /* 1.7 rather than the classic 1.5–1.6: full-width panes mean long lines,
+       and long lines need extra leading to track back to the next line. */
+    --cc-line-height: 1.7;
     --cc-line-width: 42rem;
     --font-text-size: var(--cc-body-font-size);
     --line-height-normal: var(--cc-line-height);
@@ -316,10 +324,16 @@ body {
     --cc-bg-deep:   #1a1917;                /* code / inset surfaces */
     --cc-bg-hover:  #302f2c;
 
-    --cc-text:       #e6e4dc;               /* warm off-white body text */
+    --cc-text:       #eae8e0;               /* warm off-white body text — one step
+                                               brighter so long full-width lines
+                                               stay easy to track */
     --cc-text-muted: #a8a496;
     --cc-text-faint: #767264;
     --cc-heading:    #f6f4ee;               /* bright warm heading */
+
+    /* Light-on-dark reads thinner than dark-on-light; a variable-font nudge
+       past 400 compensates (static fonts round back to 400 — harmless). */
+    --font-weight: 430;
     --cc-border:     #393833;
     --cc-border-soft:#322f2a;
     --cc-selection:  color-mix(in srgb, var(--cc-accent) 26%, transparent);
@@ -440,10 +454,23 @@ body.cc-active-line .markdown-source-view.mod-cm6 .cm-active.cm-gutterElement {
 /* Body rhythm */
 .markdown-preview-view, .markdown-source-view {
     font-family: var(--cc-font-sans);
-    -webkit-font-smoothing: antialiased;
     text-rendering: optimizeLegibility;
 }
+/* Grayscale antialiasing thins light-on-dark strokes on macOS, so it stays
+   light-mode only; dark mode keeps the heavier default rendering. */
+.theme-light .markdown-preview-view,
+.theme-light .markdown-source-view {
+    -webkit-font-smoothing: antialiased;
+}
 .markdown-rendered p { line-height: var(--cc-line-height); }
+
+/* Opt-in width cap independent of Obsidian's "Readable line length" setting.
+   Toggle: Style Settings → Typography → Limit line length. */
+body.cc-force-line-width .markdown-source-view.mod-cm6 .cm-sizer,
+body.cc-force-line-width .markdown-preview-view .markdown-preview-sizer {
+    max-width: var(--file-line-width);
+    margin-inline: auto;
+}
 
 /* Bold — Claude leans on weight + a touch more color contrast */
 .markdown-rendered strong, .cm-strong {

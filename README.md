@@ -100,6 +100,17 @@ Light and dark, side by side — inline title, coral links, warm highlights, the
   <img width="49%" src="screenshots/preview-dark.png" alt="Claude Code theme — dark mode" />
 </p>
 
+## Releasing (maintainers)
+
+The Obsidian directory reads GitHub **Releases**, not the repo — it needs a release whose tag exactly matches the `version` in `manifest.json` (no `v` prefix). After bumping that version and committing:
+
+```bash
+./release.sh                       # tags + pushes + creates the release
+./release.sh --notes "What's new"  # with custom release notes
+```
+
+The script reads the version from `manifest.json`, refuses to run on a dirty tree or an existing tag, and attaches `theme.css` + `manifest.json` to the release.
+
 ## License
 
 MIT. Not affiliated with or endorsed by Anthropic. "Claude" and "Claude Code" are trademarks of Anthropic; this is a community theme that imitates the aesthetic using free, redistributable fonts.

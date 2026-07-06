@@ -17,7 +17,9 @@
 const { Plugin, MarkdownView, Platform, debounce } = require('obsidian');
 
 const MAX_LEVEL = 3;      // render dots for H1–H3
-const MIN_GAP = 0.008;    // merge dots closer than 0.8% of the bar
+const MIN_GAP_PX = 11;    // guaranteed pixel gap between markers
+const FISHEYE_RANGE = 70;  // px radius of dock-style magnification
+const FISHEYE_BOOST = 0.45; // max extra scale at cursor
 
 module.exports = class ClaudeScrollMap extends Plugin {
   onload() {
@@ -79,7 +81,7 @@ module.exports = class ClaudeScrollMap extends Plugin {
       denomPx = Math.max(1, s.scrollHeight - s.clientHeight);
     }
 
-    let lastFrac = -1;
+    const pts = [];
     for (const h of headings) {
       let frac;
       if (cm) {
@@ -92,14 +94,35 @@ module.exports = class ClaudeScrollMap extends Plugin {
       } else {
         frac = h.position.start.offset / docLen;
       }
-      frac = Math.max(0, Math.min(1, frac));
-      if (frac - lastFrac < MIN_GAP) continue; // merge overlapping dots
-      lastFrac = frac;
+      pts.push({ h, frac: Math.max(0, Math.min(1, frac)) });
+    }
 
+    // Cluster markers that would sit closer than MIN_GAP_PX at the pane's
+    // real width; each cluster is represented by its most important
+    // heading (lowest level wins, earliest breaks ties).
+    const width = map.clientWidth || content.clientWidth || 800;
+    const minFrac = MIN_GAP_PX / Math.max(1, width);
+    const kept = [];
+    let cluster = [];
+    const flush = () => {
+      if (!cluster.length) return;
+      let best = cluster[0];
+      for (const c of cluster) if (c.h.level < best.h.level) best = c;
+      kept.push(best);
+      cluster = [];
+    };
+    for (const c of pts) {
+      if (!cluster.length || c.frac - cluster[0].frac < minFrac) cluster.push(c);
+      else { flush(); cluster.push(c); }
+    }
+    flush();
+
+    for (const { h, frac } of kept) {
       const dot = map.createEl('button', { cls: 'cc-scroll-dot' });
       dot.dataset.level = String(h.level);
+      // data-label only — an aria-label would also trigger Obsidian's
+      // native black tooltip on top of the styled one
       dot.dataset.label = h.heading;
-      dot.setAttribute('aria-label', h.heading);
       dot.style.left = (frac * 100).toFixed(2) + '%';
       dot.addEventListener('click', (evt) => {
         evt.preventDefault();
@@ -108,27 +131,40 @@ module.exports = class ClaudeScrollMap extends Plugin {
     }
   }
 
-  // Hovering the bare strip lights up the nearest dot to the left, which
-  // shows its tooltip — "the section you are inside at this bar position".
+  // Hovering the bare strip: dock-style fisheye magnification around the
+  // cursor, plus a tooltip on the nearest dot to the left — "the section
+  // you are inside at this bar position".
   onStripHover(map, e) {
     const rect = map.getBoundingClientRect();
-    const x = (e.clientX - rect.left) / Math.max(1, rect.width);
+    const px = e.clientX - rect.left;
+    const x = px / Math.max(1, rect.width);
     let best = null;
     let bestLeft = -1;
     for (const dot of map.querySelectorAll('.cc-scroll-dot')) {
       const left = parseFloat(dot.style.left) / 100;
+      const d = Math.abs(left * rect.width - px);
+      const s = 1 + FISHEYE_BOOST * Math.max(0, 1 - d / FISHEYE_RANGE);
+      dot.style.setProperty('--cc-mag', s.toFixed(3));
       if (left <= x && left > bestLeft) {
         best = dot;
         bestLeft = left;
       }
     }
-    this.clearHover(map);
+    // Pointer directly on a marker: trust it — otherwise its :hover
+    // tooltip and the nearest-left .cc-hovered tooltip both show.
+    const direct =
+      e.target instanceof HTMLElement && e.target.closest('.cc-scroll-dot');
+    if (direct) best = direct;
+    map
+      .querySelectorAll('.cc-hovered')
+      .forEach((d) => d.classList.remove('cc-hovered'));
     if (best) best.classList.add('cc-hovered');
   }
 
   clearHover(map) {
-    map
-      .querySelectorAll('.cc-hovered')
-      .forEach((d) => d.classList.remove('cc-hovered'));
+    map.querySelectorAll('.cc-scroll-dot').forEach((d) => {
+      d.classList.remove('cc-hovered');
+      d.style.removeProperty('--cc-mag');
+    });
   }
 };

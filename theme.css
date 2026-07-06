@@ -1375,23 +1375,36 @@ body.cc-scroll-progress .workspace-leaf-content[data-type="markdown"]
 }
 body.cc-scroll-progress .workspace-leaf-content[data-type="markdown"] .view-content {
     position: relative;
+    /* let centered markers straddle the line without clipping;
+       min-height keeps flex from squeezing the header (see breadcrumb) */
+    overflow: visible;
+    min-height: 0;
 }
-/* Track */
+/* The line runs along y = 5.5px — track, fill and markers all center on
+   it, metro-map style. */
+/* Track — doubles as the instrument's backdrop: a band of note
+   background fading downward masks any scrolled text passing under the
+   markers, with the 3px track line painted on top of it. */
 body.cc-scroll-progress .workspace-leaf-content[data-type="markdown"] .view-content::before {
     content: "";
     position: absolute;
     top: 0; left: 0;
-    width: 100%; height: 3px;
-    background: var(--cc-border-soft);
+    width: 100%; height: 15px;
+    background:
+        linear-gradient(var(--cc-border), var(--cc-border))
+            0 4px / 100% 3px no-repeat,
+        linear-gradient(to bottom, var(--cc-bg) 60%, transparent);
     z-index: 8;
     pointer-events: none;
+    transition: height 130ms ease;
 }
 /* Fill */
 body.cc-scroll-progress .workspace-leaf-content[data-type="markdown"] .view-content::after {
     content: "";
     position: absolute;
-    top: 0; left: 0;
+    top: 4px; left: 0;
     width: 100%; height: 3px;
+    border-radius: 2px;
     background: var(--cc-accent);
     transform: scaleX(0);           /* short notes with no scroll: empty */
     transform-origin: 0 50%;
@@ -1399,16 +1412,35 @@ body.cc-scroll-progress .workspace-leaf-content[data-type="markdown"] .view-cont
     pointer-events: none;
     animation: cc-scroll-progress-fill linear both;
     animation-timeline: --cc-note-scroll;
+    transition: height 130ms ease, top 130ms ease;
+}
+/* Hovering the scroll-map strip thickens the line, still centered */
+body.cc-scroll-progress .workspace-leaf-content[data-type="markdown"]
+    .view-content:has(> .cc-scroll-map:hover)::before {
+    height: 27px;
+    background:
+        linear-gradient(var(--cc-border), var(--cc-border))
+            0 3px / 100% 5px no-repeat,
+        linear-gradient(to bottom, var(--cc-bg) 60%, transparent);
+}
+body.cc-scroll-progress .workspace-leaf-content[data-type="markdown"]
+    .view-content:has(> .cc-scroll-map:hover)::after {
+    top: 3px;
+    height: 5px;
 }
 @keyframes cc-scroll-progress-fill {
     from { transform: scaleX(0); }
     to   { transform: scaleX(1); }
 }
-/* Mobile: bottom of the visible editor area, a touch thicker */
+/* Mobile: bottom of the visible editor area, a touch thicker; no dots
+   means no backdrop band — plain track line */
 body.cc-scroll-progress.is-mobile .workspace-leaf-content[data-type="markdown"] .view-content::before,
 body.cc-scroll-progress.is-mobile .workspace-leaf-content[data-type="markdown"] .view-content::after {
     top: auto; bottom: 0;
     height: 4px;
+}
+body.cc-scroll-progress.is-mobile .workspace-leaf-content[data-type="markdown"] .view-content::before {
+    background: var(--cc-border);
 }
 
 /* --- Claude Scroll Map (companion plugin) — heading dots on the bar ---
@@ -1417,33 +1449,79 @@ body.cc-scroll-progress.is-mobile .workspace-leaf-content[data-type="markdown"] 
 .cc-scroll-map {
     position: absolute;
     top: 0; left: 0; right: 0;
-    height: 10px;                    /* hover zone for the strip */
+    height: 12px;                    /* hover zone for the strip */
     z-index: 10;
+    transition: height 130ms ease;
 }
+/* With the progress bar on, the theme's track pseudo paints the backdrop
+   band — a bg on the map would sit above the bar and hide it. With the
+   bar toggled off, the plugin's own gradient band stays so markers never
+   float naked over note text. */
+body.cc-scroll-progress .cc-scroll-map { background: none; }
+.cc-scroll-map:hover { height: 24px; }   /* roomier target while aiming */
 /* Mobile is progress-bar-only: no room for legible dots, no hover */
 body.is-mobile .cc-scroll-map { display: none; }
-.cc-scroll-dot {
+/* Headings as terminal blocks: rounded squares (block cursors) centered
+   on the line, ringed with the note background so they read as crisp
+   markers. Warm coral family — H1 big + coral (landmarks), H2 clay,
+   H3 small + hollow. Light mode mixes toward the warm text grays;
+   dark mode mixes toward the deep surfaces instead — mixing with light
+   grays on charcoal washes everything to the same pale salmon. */
+body {
+    --cc-map-h2: color-mix(in srgb, var(--cc-accent) 45%, var(--cc-text-muted));
+    --cc-map-h3: color-mix(in srgb, var(--cc-accent) 35%, var(--cc-text-muted));
+}
+body.theme-dark {
+    --cc-map-h2: color-mix(in srgb, var(--cc-accent) 55%, var(--cc-bg-deep));
+    --cc-map-h3: color-mix(in srgb, var(--cc-accent) 45%, var(--cc-bg-deep));
+}
+.cc-scroll-map .cc-scroll-dot {
     position: absolute;
-    top: -1px;
-    transform: translateX(-50%);
-    width: 5px; height: 5px;         /* H2 default */
+    top: 5.5px;                       /* the line's center */
+    /* --cc-mag: dock-style fisheye magnification, set by the plugin on
+       strip mousemove; size changes stay centered */
+    transform: translate(-50%, -50%) scale(var(--cc-mag, 1));
+    width: 7px; height: 7px;          /* H2 default */
     padding: 0;
     border: none;
-    border-radius: 50%;
-    background: var(--cc-text-faint);
-    box-shadow: none;
+    border-radius: 2px;
+    background: var(--cc-map-h2);
+    box-shadow: 0 0 0 1.5px var(--cc-bg);   /* halo ring */
     cursor: pointer;
+    transition: height 130ms ease, width 130ms ease, background 130ms ease,
+        transform 60ms ease-out;
 }
-.cc-scroll-dot[data-level="1"] { width: 7px; height: 7px; background: var(--cc-text-muted); }
-.cc-scroll-dot[data-level="3"] { width: 4px; height: 4px; }
-.cc-scroll-dot:hover, .cc-scroll-dot.cc-hovered { background: var(--cc-accent); }
-/* Heading-name tooltip — 60% of body text size */
-.cc-scroll-dot::after {
+.cc-scroll-map .cc-scroll-dot[data-level="1"] {
+    width: 10px; height: 10px;
+    border-radius: 3px;
+    background: var(--cc-accent);
+}
+/* H3: hollow — filled-vs-outlined separates levels at a glance and keeps
+   heading-dense strips airy */
+.cc-scroll-map .cc-scroll-dot[data-level="3"] {
+    width: 6px; height: 6px;
+    border-radius: 1.5px;
+    background: var(--cc-bg);
+    border: 1.5px solid var(--cc-map-h3);
+}
+/* Hovering the strip: blocks grow TALLER, barely wider — vertical growth
+   keeps dense clusters from colliding sideways */
+.cc-scroll-map:hover .cc-scroll-dot                   { width: 8px;  height: 12px; }
+.cc-scroll-map:hover .cc-scroll-dot[data-level="1"]  { width: 12px; height: 16px; }
+.cc-scroll-map:hover .cc-scroll-dot[data-level="3"]  { width: 7px;  height: 10px; }
+.cc-scroll-map .cc-scroll-dot:hover, .cc-scroll-map .cc-scroll-dot.cc-hovered {
+    background: var(--cc-accent-bright, var(--cc-accent));
+    border-color: var(--cc-accent-bright, var(--cc-accent));
+}
+/* Heading-name tooltip — 60% of body text size, tracks the tick height */
+.cc-scroll-map .cc-scroll-dot::after {
     content: attr(data-label);
     position: absolute;
-    top: 12px;
+    top: calc(100% + 5px);
     left: 50%;
-    transform: translateX(-50%);
+    /* counter-scale so the fisheye doesn't zoom the tooltip text */
+    transform: translateX(-50%) scale(calc(1 / var(--cc-mag, 1)));
+    transform-origin: 50% 0;
     display: none;
     max-width: 32ch;
     overflow: hidden;
@@ -1459,7 +1537,7 @@ body.is-mobile .cc-scroll-map { display: none; }
     padding: 2px 8px;
     box-shadow: var(--shadow-s, 0 2px 8px rgb(0 0 0 / 0.15));
 }
-.cc-scroll-dot:hover::after, .cc-scroll-dot.cc-hovered::after { display: block; }
+.cc-scroll-map .cc-scroll-dot:hover::after, .cc-scroll-map .cc-scroll-dot.cc-hovered::after { display: block; }
 
 /* =====================================================================
    11. REDUCED MOTION  —  honour the OS "reduce motion" setting

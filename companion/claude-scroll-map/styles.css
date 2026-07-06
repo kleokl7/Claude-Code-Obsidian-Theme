@@ -1,6 +1,8 @@
 /* Claude Scroll Map — structural baseline only.
-   The Claude Code theme restyles all of this (colors, sizes, tooltip);
-   these rules just keep the plugin usable with any theme. */
+   The Claude Code theme restyles all of this (colors, sizes, hollow
+   fill-in, tooltip) with `body`-prefixed selectors that deliberately
+   out-rank these; the rules here just keep the plugin usable with any
+   theme. */
 
 .cc-scroll-map {
   position: absolute;
@@ -23,7 +25,7 @@ body.is-mobile .cc-scroll-map {
   display: none;
 }
 
-/* Headings as terminal blocks — bigger square = bigger heading */
+/* Headings as blocks — bigger block = bigger heading */
 .cc-scroll-map .cc-scroll-dot {
   position: absolute;
   top: 5.5px;
@@ -36,13 +38,23 @@ body.is-mobile .cc-scroll-map {
   background: var(--text-muted);
   box-shadow: 0 0 0 1.5px var(--background-primary);
   cursor: pointer;
-  transition: height 130ms ease, width 130ms ease;
+  transition: height 130ms ease, width 130ms ease, transform 60ms ease-out;
 }
-.cc-scroll-map .cc-scroll-dot[data-level="1"] { width: 10px; height: 10px; border-radius: 3px; background: var(--text-accent); }
-.cc-scroll-map .cc-scroll-dot[data-level="3"] { width: 5px;  height: 5px;  border-radius: 1.5px; background: var(--text-faint); }
-.cc-scroll-map:hover .cc-scroll-dot                  { width: 9px;  height: 9px; }
-.cc-scroll-map:hover .cc-scroll-dot[data-level="1"] { width: 13px; height: 13px; }
-.cc-scroll-map:hover .cc-scroll-dot[data-level="3"] { width: 7px;  height: 7px; }
+.cc-scroll-map .cc-scroll-dot[data-level="1"] {
+  width: 10px;
+  height: 10px;
+  border-radius: 3px;
+  background: var(--text-accent);
+}
+.cc-scroll-map .cc-scroll-dot[data-level="3"] {
+  width: 6px;
+  height: 6px;
+  border-radius: 1.5px;
+  background: var(--text-faint);
+}
+.cc-scroll-map:hover .cc-scroll-dot                  { width: 8px;  height: 12px; }
+.cc-scroll-map:hover .cc-scroll-dot[data-level="1"] { width: 12px; height: 16px; }
+.cc-scroll-map:hover .cc-scroll-dot[data-level="3"] { width: 7px;  height: 10px; }
 
 .cc-scroll-map .cc-scroll-dot::after {
   content: attr(data-label);

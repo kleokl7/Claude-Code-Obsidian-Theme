@@ -124,6 +124,10 @@ module.exports = class ClaudeScrollMap extends Plugin {
       // native black tooltip on top of the styled one
       dot.dataset.label = h.heading;
       dot.style.left = (frac * 100).toFixed(2) + '%';
+      // scroll fraction at which the progress fill reaches this marker —
+      // the theme's hollow→solid animation keys off it (clamped so
+      // end-of-note markers still trigger)
+      dot.style.setProperty('--cc-dot-frac', Math.min(frac, 0.995).toFixed(4));
       dot.addEventListener('click', (evt) => {
         evt.preventDefault();
         view.setEphemeralState({ line: h.position.start.line });

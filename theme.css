@@ -1446,7 +1446,7 @@ body.cc-scroll-progress.is-mobile .workspace-leaf-content[data-type="markdown"] 
 /* --- Claude Scroll Map (companion plugin) — heading dots on the bar ---
    The plugin renders .cc-scroll-map > .cc-scroll-dot[data-level] into
    each note and handles positioning/clicks; all cosmetics live here. */
-.cc-scroll-map {
+body .cc-scroll-map {
     position: absolute;
     top: 0; left: 0; right: 0;
     height: 12px;                    /* hover zone for the strip */
@@ -1458,7 +1458,7 @@ body.cc-scroll-progress.is-mobile .workspace-leaf-content[data-type="markdown"] 
    bar toggled off, the plugin's own gradient band stays so markers never
    float naked over note text. */
 body.cc-scroll-progress .cc-scroll-map { background: none; }
-.cc-scroll-map:hover { height: 24px; }   /* roomier target while aiming */
+body .cc-scroll-map:hover { height: 24px; }   /* roomier target while aiming */
 /* Mobile is progress-bar-only: no room for legible dots, no hover */
 body.is-mobile .cc-scroll-map { display: none; }
 /* Headings as terminal blocks: rounded squares (block cursors) centered
@@ -1468,14 +1468,20 @@ body.is-mobile .cc-scroll-map { display: none; }
    dark mode mixes toward the deep surfaces instead — mixing with light
    grays on charcoal washes everything to the same pale salmon. */
 body {
-    --cc-map-h2: color-mix(in srgb, var(--cc-accent) 45%, var(--cc-text-muted));
-    --cc-map-h3: color-mix(in srgb, var(--cc-accent) 35%, var(--cc-text-muted));
+    /* soft warm marker colors — light mode leans gentle, toward the
+       faint warm gray, so hollow outlines don't read harsh on cream */
+    --cc-map-h2: color-mix(in srgb, var(--cc-accent) 40%, var(--cc-text-faint));
+    --cc-map-h3: color-mix(in srgb, var(--cc-accent) 30%, var(--cc-text-faint));
 }
 body.theme-dark {
     --cc-map-h2: color-mix(in srgb, var(--cc-accent) 55%, var(--cc-bg-deep));
     --cc-map-h3: color-mix(in srgb, var(--cc-accent) 45%, var(--cc-bg-deep));
 }
-.cc-scroll-map .cc-scroll-dot {
+/* Markers start HOLLOW (outline only) and fill with their color the
+   moment the progress line reaches them — the same scroll timeline as
+   the fill, with a per-marker animation-range at the marker's own
+   position (--cc-dot-frac, set by the plugin). */
+body .cc-scroll-map .cc-scroll-dot {
     position: absolute;
     top: 5.5px;                       /* the line's center */
     /* --cc-mag: dock-style fisheye magnification, set by the plugin on
@@ -1483,38 +1489,48 @@ body.theme-dark {
     transform: translate(-50%, -50%) scale(var(--cc-mag, 1));
     width: 7px; height: 7px;          /* H2 default */
     padding: 0;
-    border: none;
     border-radius: 2px;
-    background: var(--cc-map-h2);
-    box-shadow: 0 0 0 1.5px var(--cc-bg);   /* halo ring */
+    --cc-dot-color: var(--cc-map-h2);
+    background: var(--cc-bg);         /* hollow: bg center… */
+    border: 1.5px solid var(--cc-dot-color);  /* …outlined */
+    box-shadow: 0 0 0 1.5px var(--cc-bg);     /* halo ring */
     cursor: pointer;
-    transition: height 130ms ease, width 130ms ease, background 130ms ease,
+    transition: height 130ms ease, width 130ms ease,
         transform 60ms ease-out;
+    animation: cc-scroll-dot-pass linear both;
+    animation-timeline: --cc-note-scroll;
+    animation-range:
+        calc(var(--cc-dot-frac, 0) * 100%)
+        calc(var(--cc-dot-frac, 0) * 100% + 0.5%);
 }
-.cc-scroll-map .cc-scroll-dot[data-level="1"] {
+@keyframes cc-scroll-dot-pass {
+    to { background: var(--cc-dot-color); }
+}
+body .cc-scroll-map .cc-scroll-dot[data-level="1"] {
     width: 10px; height: 10px;
     border-radius: 3px;
-    background: var(--cc-accent);
+    --cc-dot-color: var(--cc-accent);
+    background: var(--cc-bg);   /* explicit: outranks baseline level rule */
 }
-/* H3: hollow — filled-vs-outlined separates levels at a glance and keeps
-   heading-dense strips airy */
-.cc-scroll-map .cc-scroll-dot[data-level="3"] {
+body .cc-scroll-map .cc-scroll-dot[data-level="3"] {
     width: 6px; height: 6px;
     border-radius: 1.5px;
-    background: var(--cc-bg);
-    border: 1.5px solid var(--cc-map-h3);
+    --cc-dot-color: var(--cc-map-h3);
+    background: var(--cc-bg);   /* explicit: outranks baseline level rule */
 }
 /* Hovering the strip: blocks grow TALLER, barely wider — vertical growth
    keeps dense clusters from colliding sideways */
-.cc-scroll-map:hover .cc-scroll-dot                   { width: 8px;  height: 12px; }
-.cc-scroll-map:hover .cc-scroll-dot[data-level="1"]  { width: 12px; height: 16px; }
-.cc-scroll-map:hover .cc-scroll-dot[data-level="3"]  { width: 7px;  height: 10px; }
-.cc-scroll-map .cc-scroll-dot:hover, .cc-scroll-map .cc-scroll-dot.cc-hovered {
-    background: var(--cc-accent-bright, var(--cc-accent));
+body .cc-scroll-map:hover .cc-scroll-dot                   { width: 8px;  height: 12px; }
+body .cc-scroll-map:hover .cc-scroll-dot[data-level="1"]  { width: 12px; height: 16px; }
+body .cc-scroll-map:hover .cc-scroll-dot[data-level="3"]  { width: 7px;  height: 10px; }
+/* !important: the pass animation's fill mode owns `background` in the
+   cascade, so the highlight has to outrank it */
+body .cc-scroll-map .cc-scroll-dot:hover, body .cc-scroll-map .cc-scroll-dot.cc-hovered {
+    background: var(--cc-accent-bright, var(--cc-accent)) !important;
     border-color: var(--cc-accent-bright, var(--cc-accent));
 }
 /* Heading-name tooltip — 60% of body text size, tracks the tick height */
-.cc-scroll-map .cc-scroll-dot::after {
+body .cc-scroll-map .cc-scroll-dot::after {
     content: attr(data-label);
     position: absolute;
     top: calc(100% + 5px);
@@ -1537,7 +1553,7 @@ body.theme-dark {
     padding: 2px 8px;
     box-shadow: var(--shadow-s, 0 2px 8px rgb(0 0 0 / 0.15));
 }
-.cc-scroll-map .cc-scroll-dot:hover::after, .cc-scroll-map .cc-scroll-dot.cc-hovered::after { display: block; }
+body .cc-scroll-map .cc-scroll-dot:hover::after, body .cc-scroll-map .cc-scroll-dot.cc-hovered::after { display: block; }
 
 /* =====================================================================
    11. REDUCED MOTION  —  honour the OS "reduce motion" setting
@@ -1553,10 +1569,11 @@ body.theme-dark {
         animation-iteration-count: 1 !important;
         scroll-behavior: auto !important;
     }
-    /* The scroll progress fill is scroll-linked, not autonomous motion —
-       a forced time duration would pin it at 100%. Restore the timeline
-       mapping. */
-    body.cc-scroll-progress .workspace-leaf-content[data-type="markdown"] .view-content::after {
+    /* The scroll progress fill and the marker fill-in are scroll-linked,
+       not autonomous motion — a forced time duration would pin them at
+       100%. Restore the timeline mapping. */
+    body.cc-scroll-progress .workspace-leaf-content[data-type="markdown"] .view-content::after,
+    body .cc-scroll-map .cc-scroll-dot {
         animation-duration: auto !important;
     }
 }

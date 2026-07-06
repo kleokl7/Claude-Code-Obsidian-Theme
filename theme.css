@@ -1414,9 +1414,12 @@ body.cc-scroll-progress .workspace-leaf-content[data-type="markdown"] .view-cont
     animation-timeline: --cc-note-scroll;
     transition: height 130ms ease, top 130ms ease;
 }
-/* Hovering the scroll-map strip thickens the line, still centered */
+/* Hovering the scroll-map strip thickens the line, still centered.
+   The .cc-map-hover class is toggled by the companion plugin on strip
+   enter/leave — cheaper than :has(:hover), which re-evaluates on every
+   pointer move. */
 body.cc-scroll-progress .workspace-leaf-content[data-type="markdown"]
-    .view-content:has(> .cc-scroll-map:hover)::before {
+    .view-content.cc-map-hover::before {
     height: 27px;
     background:
         linear-gradient(var(--cc-border), var(--cc-border))
@@ -1424,7 +1427,7 @@ body.cc-scroll-progress .workspace-leaf-content[data-type="markdown"]
         linear-gradient(to bottom, var(--cc-bg) 60%, transparent);
 }
 body.cc-scroll-progress .workspace-leaf-content[data-type="markdown"]
-    .view-content:has(> .cc-scroll-map:hover)::after {
+    .view-content.cc-map-hover::after {
     top: 3px;
     height: 5px;
 }

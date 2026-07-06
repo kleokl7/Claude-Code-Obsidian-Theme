@@ -163,6 +163,9 @@ module.exports = class ClaudeScrollMap extends Plugin {
       .querySelectorAll('.cc-hovered')
       .forEach((d) => d.classList.remove('cc-hovered'));
     if (best) best.classList.add('cc-hovered');
+    // Drives the theme's line-thickening. A toggled class is cheaper than
+    // the CSS :has(:hover) it replaces (no per-pointer-move recalc).
+    if (map.parentElement) map.parentElement.classList.add('cc-map-hover');
   }
 
   clearHover(map) {
@@ -170,5 +173,6 @@ module.exports = class ClaudeScrollMap extends Plugin {
       d.classList.remove('cc-hovered');
       d.style.removeProperty('--cc-mag');
     });
+    if (map.parentElement) map.parentElement.classList.remove('cc-map-hover');
   }
 };

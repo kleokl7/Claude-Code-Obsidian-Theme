@@ -1,4 +1,4 @@
-# Claude Code — an Obsidian theme
+# Claude Code Orange
 
 A faithful recreation of the look and feel of **Claude Code in the Claude mobile app**, for [Obsidian](https://obsidian.md). Warm cream / charcoal surfaces, the signature Claude coral accent, a Styrene-style grotesque typeface, and a calm reading rhythm — in both **light** and **dark**.
 

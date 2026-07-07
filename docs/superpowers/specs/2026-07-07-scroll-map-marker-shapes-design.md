@@ -52,6 +52,28 @@ H1 gets it from its background disc. Both are opaque `--cc-bg`.
   `[data-level="1"]`/`[data-level="3"]` theme rules — the plugin's baseline
   level selectors outrank the theme's base rule (this is why the old code
   had those "explicit: outranks baseline" declarations).
+
+## Mobile (added same day, approved via second mockup)
+
+Markers now show on mobile too, riding the theme's bottom progress bar,
+**cut in half** and **visual only** (Kleanthi's call: no tap-to-jump).
+
+- Plugin: the `Platform.isMobile` early-return in `onload()` is gone;
+  instead the hover/fisheye listeners and the dot click handler are
+  desktop-only. Baseline `styles.css` still hides the map on mobile —
+  themes must opt in.
+- Theme: `body.cc-scroll-progress.is-mobile .cc-scroll-map` bottom-docks
+  the map (`height: 14px; overflow: hidden`) so every marker is sliced at
+  the screen edge; dots get `top: 100%` (equator on the clip edge — a true
+  half) and `pointer-events: none`. All heading levels render (variant A);
+  the plugin's `MIN_GAP_PX` clustering handles phone-width density
+  (42 headings → 24 markers at 380pt). Mobile sizes run slightly larger
+  (9/20/7px) since only the top half shows.
+- The mobile bar's `::before` grew into an 18px upward-fading band (like
+  desktop's) so note text dissolves before it reaches the marker tips;
+  the 4px track paints at the band's bottom edge.
+- Without the scroll-progress toggle there is no bar, so the map stays
+  hidden on mobile.
 - Reduced-motion carve-out must also cover `.cc-scroll-dot::before`, or the
   global 0.01ms override pins the H1 fill at 100%.
 - Mobile stays hidden; plugin band fallback unchanged.

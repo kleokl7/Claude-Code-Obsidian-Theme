@@ -19,8 +19,9 @@
 .cc-scroll-map:hover {
   height: 24px;
 }
-/* Mobile is progress-bar-only — the plugin doesn't even load there, this
-   is just a belt-and-braces guard for synced DOM/state. */
+/* Mobile baseline: hidden. The plugin does render markers on mobile,
+   but only a theme that docks them somewhere sensible should show them —
+   the Claude Code theme opts in (bottom-bar, cut-in-half, visual-only). */
 body.is-mobile .cc-scroll-map {
   display: none;
 }

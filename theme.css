@@ -1443,7 +1443,13 @@ body.cc-scroll-progress.is-mobile .workspace-leaf-content[data-type="markdown"] 
     height: 4px;
 }
 body.cc-scroll-progress.is-mobile .workspace-leaf-content[data-type="markdown"] .view-content::before {
-    background: var(--cc-border);
+    /* like desktop's band: bg fading upward masks text passing under the
+       markers, with the 4px track painted at the bottom of it */
+    height: 18px;
+    background:
+        linear-gradient(var(--cc-border), var(--cc-border))
+            0 100% / 100% 4px no-repeat,
+        linear-gradient(to top, var(--cc-bg) 40%, transparent);
 }
 
 /* --- Claude Scroll Map (companion plugin) — heading dots on the bar ---
@@ -1462,8 +1468,30 @@ body .cc-scroll-map {
    float naked over note text. */
 body.cc-scroll-progress .cc-scroll-map { background: none; }
 body .cc-scroll-map:hover { height: 24px; }   /* roomier target while aiming */
-/* Mobile is progress-bar-only: no room for legible dots, no hover */
+/* Mobile: markers ride the theme's BOTTOM progress bar, cut at their
+   middle — the map bottom-docks over the bar and overflow-hidden slices
+   every marker at the screen edge. Purely visual: no tap-to-jump, no
+   hover (pointer-events off). Without the progress bar toggle there is
+   no bar to ride, so the map stays hidden. */
 body.is-mobile .cc-scroll-map { display: none; }
+body.cc-scroll-progress.is-mobile .cc-scroll-map {
+    display: block;
+    top: auto;
+    bottom: 0;
+    height: 14px;
+    overflow: hidden;      /* the cut: bottom half never renders */
+    background: none;
+    pointer-events: none;
+}
+body.cc-scroll-progress.is-mobile .cc-scroll-map .cc-scroll-dot {
+    top: 100%;                        /* equator on the clip edge: true half */
+    pointer-events: none;
+    cursor: default;
+}
+/* mobile sizes: a touch bigger than desktop — only the top half shows */
+body.cc-scroll-progress.is-mobile .cc-scroll-map .cc-scroll-dot                  { width: 9px;  height: 9px; }
+body.cc-scroll-progress.is-mobile .cc-scroll-map .cc-scroll-dot[data-level="1"]  { width: 20px; height: 20px; }
+body.cc-scroll-progress.is-mobile .cc-scroll-map .cc-scroll-dot[data-level="3"]  { width: 7px;  height: 7px; }
 /* Headings as brand marks: the Claude starburst for H1 landmarks,
    soft coral circles for H2/H3. Every marker is full coral once read;
    unread markers are the same coral mixed toward the note background —

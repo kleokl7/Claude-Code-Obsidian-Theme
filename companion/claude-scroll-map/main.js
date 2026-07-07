@@ -12,6 +12,9 @@
  * - Hover the bare strip → tooltip of the nearest heading dot to the left
  * - Click / tap a dot → jump to that heading (works in both modes)
  * - Dots that would visually overlap are merged (higher level wins)
+ * - Mobile: markers render too (the theme docks them on its bottom
+ *   progress bar, cut at the middle) but are VISUAL ONLY — no hover,
+ *   no fisheye, no tap-to-jump; the theme also sets pointer-events:none
  */
 
 const { Plugin, MarkdownView, Platform, debounce } = require('obsidian');
@@ -23,9 +26,6 @@ const FISHEYE_BOOST = 0.45; // max extra scale at cursor
 
 module.exports = class ClaudeScrollMap extends Plugin {
   onload() {
-    // Mobile stays progress-bar-only (the theme's CSS bar): a phone-width
-    // strip can't fit heading dots legibly, and there's no hover anyway.
-    if (Platform.isMobile) return;
     this.refresh = debounce(() => this.updateAll(), 250, true);
     this.registerEvent(this.app.workspace.on('layout-change', this.refresh));
     this.registerEvent(this.app.workspace.on('active-leaf-change', this.refresh));
@@ -62,8 +62,10 @@ module.exports = class ClaudeScrollMap extends Plugin {
 
     if (!map) {
       map = content.createDiv({ cls: 'cc-scroll-map' });
-      map.addEventListener('mousemove', (e) => this.onStripHover(map, e));
-      map.addEventListener('mouseleave', () => this.clearHover(map));
+      if (!Platform.isMobile) {
+        map.addEventListener('mousemove', (e) => this.onStripHover(map, e));
+        map.addEventListener('mouseleave', () => this.clearHover(map));
+      }
     }
     map.empty();
 
@@ -128,10 +130,12 @@ module.exports = class ClaudeScrollMap extends Plugin {
       // the theme's hollow→solid animation keys off it (clamped so
       // end-of-note markers still trigger)
       dot.style.setProperty('--cc-dot-frac', Math.min(frac, 0.995).toFixed(4));
-      dot.addEventListener('click', (evt) => {
-        evt.preventDefault();
-        view.setEphemeralState({ line: h.position.start.line });
-      });
+      if (!Platform.isMobile) {
+        dot.addEventListener('click', (evt) => {
+          evt.preventDefault();
+          view.setEphemeralState({ line: h.position.start.line });
+        });
+      }
     }
   }
 

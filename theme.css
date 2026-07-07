@@ -1464,26 +1464,17 @@ body.cc-scroll-progress .cc-scroll-map { background: none; }
 body .cc-scroll-map:hover { height: 24px; }   /* roomier target while aiming */
 /* Mobile is progress-bar-only: no room for legible dots, no hover */
 body.is-mobile .cc-scroll-map { display: none; }
-/* Headings as terminal blocks: rounded squares (block cursors) centered
-   on the line, ringed with the note background so they read as crisp
-   markers. Warm coral family — H1 big + coral (landmarks), H2 clay,
-   H3 small + hollow. Light mode mixes toward the warm text grays;
-   dark mode mixes toward the deep surfaces instead — mixing with light
-   grays on charcoal washes everything to the same pale salmon. */
-body {
-    /* soft warm marker colors — light mode leans gentle, toward the
-       faint warm gray, so hollow outlines don't read harsh on cream */
-    --cc-map-h2: color-mix(in srgb, var(--cc-accent) 40%, var(--cc-text-faint));
-    --cc-map-h3: color-mix(in srgb, var(--cc-accent) 30%, var(--cc-text-faint));
-}
-body.theme-dark {
-    --cc-map-h2: color-mix(in srgb, var(--cc-accent) 55%, var(--cc-bg-deep));
-    --cc-map-h3: color-mix(in srgb, var(--cc-accent) 45%, var(--cc-bg-deep));
-}
-/* Markers start HOLLOW (outline only) and fill with their color the
-   moment the progress line reaches them — the same scroll timeline as
-   the fill, with a per-marker animation-range at the marker's own
-   position (--cc-dot-frac, set by the plugin). */
+/* Headings as brand marks: the Claude starburst for H1 landmarks,
+   soft coral circles for H2/H3. Every marker is full coral once read;
+   unread markers are the same coral mixed toward the note background —
+   OPAQUE on purpose, so the progress line never shows through. Each
+   marker punches a gap in the line (halo ring / backing disc): the line
+   never touches a marker in any state. */
+/* Markers start FADED and turn full coral the moment the progress line
+   reaches them — the same scroll timeline as the fill, with a per-marker
+   animation-range at the marker's own position (--cc-dot-frac, set by
+   the plugin). The element itself is an opaque note-bg disc (that disc
+   is the gap in the line); the coral lives on ::before. */
 body .cc-scroll-map .cc-scroll-dot {
     position: absolute;
     top: 5.5px;                       /* the line's center */
@@ -1492,14 +1483,26 @@ body .cc-scroll-map .cc-scroll-dot {
     transform: translate(-50%, -50%) scale(var(--cc-mag, 1));
     width: 7px; height: 7px;          /* H2 default */
     padding: 0;
-    border-radius: 2px;
-    --cc-dot-color: var(--cc-map-h2);
-    background: var(--cc-bg);         /* hollow: bg center… */
-    border: 1.5px solid var(--cc-dot-color);  /* …outlined */
-    box-shadow: 0 0 0 1.5px var(--cc-bg);     /* halo ring */
+    border: none;
+    border-radius: 50%;
+    --cc-dot-color: var(--cc-accent);
+    background: var(--cc-bg);
+    box-shadow: 0 0 0 2px var(--cc-bg);  /* halo ring widens the gap */
     cursor: pointer;
     transition: height 130ms ease, width 130ms ease,
         transform 60ms ease-out;
+}
+/* The fade is OPACITY, not a color-mix: Chromium's scroll-driven color
+   interpolation miscomputes between color-mix() and hex endpoints (the
+   fill came out neon yellow); opacity is numeric and safe. 45% coral
+   over the opaque bg disc looks identical to a 45% mix toward bg. */
+body .cc-scroll-map .cc-scroll-dot::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    background: var(--cc-dot-color);
+    opacity: 0.45;
     animation: cc-scroll-dot-pass linear both;
     animation-timeline: --cc-note-scroll;
     animation-range:
@@ -1507,30 +1510,38 @@ body .cc-scroll-map .cc-scroll-dot {
         calc(var(--cc-dot-frac, 0) * 100% + 0.5%);
 }
 @keyframes cc-scroll-dot-pass {
-    to { background: var(--cc-dot-color); }
+    to { opacity: 1; }
 }
+/* H1: the Claude starburst — ::before trades its disc for an SVG mask.
+   Masks clip box-shadow, so the element disc alone provides the gap. */
 body .cc-scroll-map .cc-scroll-dot[data-level="1"] {
-    width: 10px; height: 10px;
-    border-radius: 3px;
-    --cc-dot-color: var(--cc-accent);
-    background: var(--cc-bg);   /* explicit: outranks baseline level rule */
+    width: 16px; height: 16px;
+    border-radius: 50%;   /* explicit: outranks plugin baseline level rule */
+    background: var(--cc-bg);
+    box-shadow: none;
+}
+body .cc-scroll-map .cc-scroll-dot[data-level="1"]::before {
+    inset: 2px;
+    border-radius: 0;
+    -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='-12 -12 24 24'%3E%3Cpath d='M0 0L10 0M0 0L6.7 4.4M0 0L3.9 8.7M0 0L-1.3 7.9M0 0L-6.7 7.4M0 0L-8.2 2.2M0 0L-9 -2.9M0 0L-5 -6.2M0 0L-1.1 -10M0 0L3.9 -7.6M0 0L7.8 -4.5' stroke='black' stroke-width='2.8' stroke-linecap='round' fill='none'/%3E%3C/svg%3E") center / contain no-repeat;
+    mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='-12 -12 24 24'%3E%3Cpath d='M0 0L10 0M0 0L6.7 4.4M0 0L3.9 8.7M0 0L-1.3 7.9M0 0L-6.7 7.4M0 0L-8.2 2.2M0 0L-9 -2.9M0 0L-5 -6.2M0 0L-1.1 -10M0 0L3.9 -7.6M0 0L7.8 -4.5' stroke='black' stroke-width='2.8' stroke-linecap='round' fill='none'/%3E%3C/svg%3E") center / contain no-repeat;
 }
 body .cc-scroll-map .cc-scroll-dot[data-level="3"] {
     width: 6px; height: 6px;
-    border-radius: 1.5px;
-    --cc-dot-color: var(--cc-map-h3);
-    background: var(--cc-bg);   /* explicit: outranks baseline level rule */
+    border-radius: 50%;   /* explicit: outranks plugin baseline level rule */
+    background: var(--cc-bg);
 }
-/* Hovering the strip: blocks grow TALLER, barely wider — vertical growth
-   keeps dense clusters from colliding sideways */
-body .cc-scroll-map:hover .cc-scroll-dot                   { width: 8px;  height: 12px; }
-body .cc-scroll-map:hover .cc-scroll-dot[data-level="1"]  { width: 12px; height: 16px; }
-body .cc-scroll-map:hover .cc-scroll-dot[data-level="3"]  { width: 7px;  height: 10px; }
-/* !important: the pass animation's fill mode owns `background` in the
+/* Hovering the strip: uniform growth — circles can't stretch tall like
+   the old blocks; the fisheye handles crowding where you're aiming */
+body .cc-scroll-map:hover .cc-scroll-dot                   { width: 9px;  height: 9px; }
+body .cc-scroll-map:hover .cc-scroll-dot[data-level="1"]  { width: 20px; height: 20px; }
+body .cc-scroll-map:hover .cc-scroll-dot[data-level="3"]  { width: 8px;  height: 8px; }
+/* !important: the pass animation's fill mode owns `opacity` in the
    cascade, so the highlight has to outrank it */
-body .cc-scroll-map .cc-scroll-dot:hover, body .cc-scroll-map .cc-scroll-dot.cc-hovered {
+body .cc-scroll-map .cc-scroll-dot:hover::before,
+body .cc-scroll-map .cc-scroll-dot.cc-hovered::before {
     background: var(--cc-accent-bright, var(--cc-accent)) !important;
-    border-color: var(--cc-accent-bright, var(--cc-accent));
+    opacity: 1 !important;
 }
 /* Heading-name tooltip — 60% of body text size, tracks the tick height */
 body .cc-scroll-map .cc-scroll-dot::after {
@@ -1576,7 +1587,8 @@ body .cc-scroll-map .cc-scroll-dot:hover::after, body .cc-scroll-map .cc-scroll-
        not autonomous motion — a forced time duration would pin them at
        100%. Restore the timeline mapping. */
     body.cc-scroll-progress .workspace-leaf-content[data-type="markdown"] .view-content::after,
-    body .cc-scroll-map .cc-scroll-dot {
+    body .cc-scroll-map .cc-scroll-dot,
+    body .cc-scroll-map .cc-scroll-dot::before {
         animation-duration: auto !important;
     }
 }

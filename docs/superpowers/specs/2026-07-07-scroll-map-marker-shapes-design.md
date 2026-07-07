@@ -27,9 +27,13 @@ Approved visually by Kleanthi (widget mockups, 2026-07-07).
 - **Filled ("read") markers are full coral at every level**: `--cc-accent`
   (`#c15f3c` light / `#d97757` dark). The old `--cc-map-h2` / `--cc-map-h3`
   muted mixes are deleted; hierarchy comes from size + the H1 spark shape.
-- **Faded ("unread") markers**: the same coral mixed **45%** toward the note
-  background — `color-mix(in srgb, var(--cc-accent) 45%, var(--cc-bg))`.
-  Opaque on purpose: the progress line must never show through a marker.
+- **Faded ("unread") markers**: the same coral at **45% opacity** over the
+  marker's opaque note-bg disc — visually identical to a 45% mix toward the
+  background, and the disc stays opaque so the progress line never shows
+  through a marker. (First cut animated a `color-mix()` background to a hex;
+  Chromium's scroll-driven color interpolation miscomputed it to neon
+  yellow — `oklab(1 95 60)`, the raw sRGB channels unconverted. Animating
+  `opacity` on a full-coral `::before` layer is numeric and immune.)
 - No more hollow/outline state; borders are removed entirely.
 
 ### Line gap (key requirement)
@@ -38,13 +42,16 @@ hovered). Circles get a `box-shadow: 0 0 0 2px var(--cc-bg)` halo ring;
 H1 gets it from its background disc. Both are opaque `--cc-bg`.
 
 ### Behavior kept as-is
-- Fade→fill on scroll: the existing `cc-scroll-dot-pass` keyframe animating
-  `background` on the note's scroll timeline, with per-marker
-  `animation-range` from `--cc-dot-frac`. For H1 the animation moves to
-  `::before` (the sparkle layer); the element itself gets `animation: none`.
+- Fade→fill on scroll: the `cc-scroll-dot-pass` keyframe (now `to {opacity: 1}`)
+  runs on every marker's `::before` color layer, on the note's scroll
+  timeline with per-marker `animation-range` from `--cc-dot-frac`.
 - Hover highlight (`--cc-accent-bright`) + tooltip `::after`. The bright
-  hover background targets `:not([data-level="1"])` elements and
-  `[data-level="1"]::before`, so the H1 knockout disc never turns coral.
+  hover background targets `::before` on all levels, so the knockout discs
+  never turn coral.
+- Per-level `border-radius`/`background` must stay explicit on the
+  `[data-level="1"]`/`[data-level="3"]` theme rules — the plugin's baseline
+  level selectors outrank the theme's base rule (this is why the old code
+  had those "explicit: outranks baseline" declarations).
 - Reduced-motion carve-out must also cover `.cc-scroll-dot::before`, or the
   global 0.01ms override pins the H1 fill at 100%.
 - Mobile stays hidden; plugin band fallback unchanged.

@@ -72,31 +72,49 @@ module.exports = class ClaudeScrollMap extends Plugin {
     // Fractions along the bar. In the editor, CodeMirror gives real pixel
     // offsets (matches the CSS fill exactly); in reading mode fall back to
     // character-offset ratio — close enough for a strip map.
-    const cm =
+    let cm =
       view.getMode() !== 'preview' && view.editor && view.editor.cm
         ? view.editor.cm
         : null;
     const docLen = Math.max(1, view.editor ? view.editor.getValue().length : 1);
     let denomPx = 1;
+    let denomDoc = 1;
     if (cm) {
       const s = cm.scrollDOM;
-      denomPx = Math.max(1, s.scrollHeight - s.clientHeight);
+      denomPx = s.scrollHeight - s.clientHeight;
+      denomDoc = Math.max(1, s.scrollHeight);
+      // A note that fits without scrolling has no scroll range to map the
+      // fill onto — fall back to char-offset fractions, same as reading
+      // mode.
+      if (denomPx <= 0) cm = null;
     }
 
     const pts = [];
     for (const h of headings) {
-      let frac;
+      let frac, fill;
       if (cm) {
         try {
           const pos = Math.min(h.position.start.offset, cm.state.doc.length - 1);
-          frac = cm.lineBlockAt(Math.max(0, pos)).top / denomPx;
+          const top = cm.lineBlockAt(Math.max(0, pos)).top;
+          // Marker position: fraction of the DOCUMENT (a true minimap).
+          // Dividing by the scroll range instead compresses every heading
+          // in the final viewport onto the bar's right edge — degenerating
+          // to "everything at 100%" on notes that barely scroll.
+          frac = top / denomDoc;
+          // Fill trigger: fraction of the SCROLL RANGE — that's what the
+          // scroll timeline driving the theme's fade→fill runs on.
+          fill = top / denomPx;
         } catch (_) {
-          frac = h.position.start.offset / docLen;
+          frac = fill = h.position.start.offset / docLen;
         }
       } else {
-        frac = h.position.start.offset / docLen;
+        frac = fill = h.position.start.offset / docLen;
       }
-      pts.push({ h, frac: Math.max(0, Math.min(1, frac)) });
+      pts.push({
+        h,
+        frac: Math.max(0, Math.min(1, frac)),
+        fill: Math.max(0, Math.min(1, fill)),
+      });
     }
 
     // Cluster markers that would sit closer than MIN_GAP_PX at the pane's
@@ -119,7 +137,7 @@ module.exports = class ClaudeScrollMap extends Plugin {
     }
     flush();
 
-    for (const { h, frac } of kept) {
+    for (const { h, frac, fill } of kept) {
       const dot = map.createEl('button', { cls: 'cc-scroll-dot' });
       dot.dataset.level = String(h.level);
       // data-label only — an aria-label would also trigger Obsidian's
@@ -127,9 +145,9 @@ module.exports = class ClaudeScrollMap extends Plugin {
       dot.dataset.label = h.heading;
       dot.style.left = (frac * 100).toFixed(2) + '%';
       // scroll fraction at which the progress fill reaches this marker —
-      // the theme's hollow→solid animation keys off it (clamped so
+      // the theme's fade→fill animation keys off it (clamped so
       // end-of-note markers still trigger)
-      dot.style.setProperty('--cc-dot-frac', Math.min(frac, 0.995).toFixed(4));
+      dot.style.setProperty('--cc-dot-frac', Math.min(fill, 0.995).toFixed(4));
       if (!Platform.isMobile) {
         dot.addEventListener('click', (evt) => {
           evt.preventDefault();

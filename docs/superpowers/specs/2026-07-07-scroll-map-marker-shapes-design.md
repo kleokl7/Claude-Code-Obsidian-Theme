@@ -74,6 +74,19 @@ Markers now show on mobile too, riding the theme's bottom progress bar,
   the 4px track paints at the band's bottom edge.
 - Without the scroll-progress toggle there is no bar, so the map stays
   hidden on mobile.
+
+## Marker positioning (bugfix, same day)
+
+Marker `left` was a fraction of the SCROLL RANGE (`top / (scrollHeight −
+clientHeight)`), which compresses every heading in the final viewport onto
+the bar's right edge — and degenerates completely ("first marker left,
+everything else at 100%") on notes that fit the window. Now:
+
+- `left` = fraction of the DOCUMENT (`top / scrollHeight`) — a true minimap.
+- `--cc-dot-frac` (the fade→fill trigger) stays a fraction of the scroll
+  range, since that is what the scroll timeline runs on.
+- Notes with no scroll range at all fall back to char-offset fractions
+  (the reading-mode path).
 - Reduced-motion carve-out must also cover `.cc-scroll-dot::before`, or the
   global 0.01ms override pins the H1 fill at 100%.
 - Mobile stays hidden; plugin band fallback unchanged.

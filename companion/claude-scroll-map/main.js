@@ -27,6 +27,16 @@ const FISHEYE_BOOST = 0.45; // max extra scale at cursor
 module.exports = class ClaudeScrollMap extends Plugin {
   onload() {
     this.refresh = debounce(() => this.updateAll(), 250, true);
+    // Folding/unfolding a heading fires none of the workspace events below,
+    // yet it changes the scroller's geometry — so the marker fractions
+    // (--cc-dot-frac, keyed off the scroll range) silently go stale and the
+    // dots stop filling as the progress line passes them. A ResizeObserver
+    // on each note's content box catches exactly those height changes (fold,
+    // edit, reflow) and recomputes. WeakSet guards against re-observing the
+    // same element (the observe() self-fire would otherwise loop via refresh).
+    this.geoObserver = new ResizeObserver(() => this.refresh());
+    this.register(() => this.geoObserver.disconnect());
+    this.observed = new WeakSet();
     this.registerEvent(this.app.workspace.on('layout-change', this.refresh));
     this.registerEvent(this.app.workspace.on('active-leaf-change', this.refresh));
     this.registerEvent(this.app.workspace.on('file-open', this.refresh));
@@ -89,32 +99,40 @@ module.exports = class ClaudeScrollMap extends Plugin {
       if (denomPx <= 0) cm = null;
     }
 
+    // Watch the box whose height tracks the scroll range, so a fold/unfold
+    // (which fires no workspace event) triggers a recompute. In the editor
+    // that's the CodeMirror content; in reading mode, the preview sizer.
+    const geoEl = cm
+      ? cm.contentDOM
+      : content.querySelector('.markdown-preview-sizer');
+    if (geoEl && !this.observed.has(geoEl)) {
+      this.observed.add(geoEl);
+      this.geoObserver.observe(geoEl);
+    }
+
     const pts = [];
     for (const h of headings) {
-      let frac, fill;
+      let frac;
       if (cm) {
         try {
           const pos = Math.min(h.position.start.offset, cm.state.doc.length - 1);
           const top = cm.lineBlockAt(Math.max(0, pos)).top;
-          // Marker position: fraction of the DOCUMENT (a true minimap).
-          // Dividing by the scroll range instead compresses every heading
-          // in the final viewport onto the bar's right edge — degenerating
-          // to "everything at 100%" on notes that barely scroll.
+          // Position AND fill trigger are the same value: the marker's
+          // fraction of the DOCUMENT height (a true minimap). The progress
+          // fill is a full-width bar scaled by scroll progress, so its
+          // leading edge sits at x = progress. A marker drawn at x = frac
+          // must therefore fill exactly when progress reaches frac — using
+          // the scroll RANGE (top/denomPx) instead makes the trigger drift
+          // ahead of the marker, so the line visibly sweeps past still-faded
+          // dots (badly so when the note barely scrolls, e.g. folded).
           frac = top / denomDoc;
-          // Fill trigger: fraction of the SCROLL RANGE — that's what the
-          // scroll timeline driving the theme's fade→fill runs on.
-          fill = top / denomPx;
         } catch (_) {
-          frac = fill = h.position.start.offset / docLen;
+          frac = h.position.start.offset / docLen;
         }
       } else {
-        frac = fill = h.position.start.offset / docLen;
+        frac = h.position.start.offset / docLen;
       }
-      pts.push({
-        h,
-        frac: Math.max(0, Math.min(1, frac)),
-        fill: Math.max(0, Math.min(1, fill)),
-      });
+      pts.push({ h, frac: Math.max(0, Math.min(1, frac)) });
     }
 
     // Cluster markers that would sit closer than MIN_GAP_PX at the pane's
@@ -137,17 +155,17 @@ module.exports = class ClaudeScrollMap extends Plugin {
     }
     flush();
 
-    for (const { h, frac, fill } of kept) {
+    for (const { h, frac } of kept) {
       const dot = map.createEl('button', { cls: 'cc-scroll-dot' });
       dot.dataset.level = String(h.level);
       // data-label only — an aria-label would also trigger Obsidian's
       // native black tooltip on top of the styled one
       dot.dataset.label = h.heading;
       dot.style.left = (frac * 100).toFixed(2) + '%';
-      // scroll fraction at which the progress fill reaches this marker —
-      // the theme's fade→fill animation keys off it (clamped so
-      // end-of-note markers still trigger)
-      dot.style.setProperty('--cc-dot-frac', Math.min(fill, 0.995).toFixed(4));
+      // The fill animation keys off the marker's own position, so the dot
+      // turns coral the instant the progress line's leading edge reaches it
+      // (clamped so a marker sitting at the very end still triggers).
+      dot.style.setProperty('--cc-dot-frac', Math.min(frac, 0.995).toFixed(4));
       if (!Platform.isMobile) {
         dot.addEventListener('click', (evt) => {
           evt.preventDefault();

@@ -1240,9 +1240,12 @@ button.mod-cta { font-weight: 600; }
    ===================================================================== */
 
 /* Hide the note title while a heading trail is active (visibility too,
-   so the invisible title can't catch clicks meant for the breadcrumb). */
+   so the invisible title can't catch clicks meant for the breadcrumb).
+   Asymmetric timing: hiding is immediate, un-hiding waits 160ms — the
+   plugin unmounts the trail for ~a frame while re-rendering it, and
+   without the delay every re-render flashes the title over the trail. */
 body.cc-sticky-in-header:not(.is-mobile) .view-header-title {
-    transition: opacity 120ms ease;
+    transition: opacity 120ms ease 160ms, visibility 0s linear 160ms;
 }
 body.cc-sticky-in-header:not(.is-mobile)
     .workspace-leaf:has(.sticky-headings-root:not(.sticky-headings-shadow)
@@ -1250,6 +1253,7 @@ body.cc-sticky-in-header:not(.is-mobile)
     .view-header-title {
     opacity: 0;
     visibility: hidden;
+    transition: opacity 120ms ease, visibility 0s linear;
 }
 
 /* Let the repositioned trail escape the note area and overlay the header.

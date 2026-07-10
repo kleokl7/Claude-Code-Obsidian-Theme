@@ -27,7 +27,7 @@ the implementation plan live here.
 | Vault access | Storage Access Framework folder picker (persistable URI permission); vault is a local folder kept in sync by Obsidian Sync |
 | Rendering | Rendered markdown (reading-view-like), not raw text |
 | Distribution | Signed APK built on the Mac, sideloaded to the phone |
-| Framework | Jetpack Glance (Compose-style API over RemoteViews) |
+| Framework | Classic AppWidgetProvider + RemoteViewsService (ListView). Chosen over Jetpack Glance because Glance text cannot render per-span inline styles (bold/italic within a line), which the rendering requirement needs; RemoteViews TextViews accept SpannableString. |
 
 ## Components
 
@@ -56,13 +56,15 @@ the implementation plan live here.
   write the file, refresh the widget immediately.
 - Any other row tap → opens the popup editor.
 - Refresh triggers: user interaction, widget update broadcast, periodic
-  `WorkManager` job (15 min — Android's floor), and a `FileObserver` while the
-  app process is alive. Some lag after a background sync is accepted.
+  `WorkManager` job (15 min — Android's floor), and whenever one of the app's
+  activities resumes. (`FileObserver` doesn't work on SAF folder grants, so
+  there is no file-watch; some lag after a background sync is accepted.)
 
 ### 4. Widget configuration activity
 - Launched on widget placement (`ACTION_APPWIDGET_CONFIGURE`).
 - Searchable list of vault notes; selection stored per `appWidgetId`
-  (DataStore). Re-configurable by tapping the widget header title.
+  (SharedPreferences — RemoteViews factories need synchronous reads).
+  Re-configurable by tapping the widget header title.
 
 ### 5. Popup editor activity
 - Dialog-themed activity floating over the home screen.

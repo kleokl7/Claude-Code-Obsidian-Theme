@@ -110,29 +110,58 @@ module.exports = class ClaudeScrollMap extends Plugin {
       this.geoObserver.observe(geoEl);
     }
 
+    // Two coordinate systems meet on this bar, and reconciling them is the
+    // whole trick:
+    //
+    //   posFrac  = top / DOCUMENT height   → where the dot is DRAWN.
+    //     A true minimap: dots spread by their position in the note, which
+    //     stays sensible even when folding collapses the scroll range to
+    //     almost nothing.
+    //
+    //   fillFrac = top / SCROLL RANGE      → the scroll PROGRESS at which the
+    //     heading reaches the top of the viewport (progress = scrollTop /
+    //     range). This is when the dot should turn coral. Triggering on
+    //     posFrac instead lit dots ≈ clientHeight/scrollHeight (one screen's
+    //     worth, often 1–2 headings) EARLY, because the progress bar advances
+    //     in range-space while the dots sit in document-space.
+    //
+    // Those two spaces differ by exactly fillMax = range / scrollHeight (the
+    // last screenful can never scroll to the top, so it has no range). The
+    // fill bar is scaled by fillMax (see --cc-fill-max below and the
+    // cc-scroll-progress-fill keyframes) so its leading edge, drawn at
+    // progress × fillMax = scrollTop / scrollHeight, lands in DOCUMENT space
+    // too. Result: the line's edge reaches a dot's posFrac exactly when
+    // progress hits that dot's fillFrac — the line and the dot light up
+    // together, and both track the content instead of racing ahead.
+    const fillMax =
+      denomPx > 0 && denomDoc > 0
+        ? Math.max(0.01, Math.min(1, denomPx / denomDoc))
+        : 1;
+    content.style.setProperty('--cc-fill-max', fillMax.toFixed(4));
+
     const pts = [];
     for (const h of headings) {
-      let frac;
+      let posFrac, fillFrac;
       if (cm) {
         try {
           const pos = Math.min(h.position.start.offset, cm.state.doc.length - 1);
           const top = cm.lineBlockAt(Math.max(0, pos)).top;
-          // Position AND fill trigger are the same value: the marker's
-          // fraction of the DOCUMENT height (a true minimap). The progress
-          // fill is a full-width bar scaled by scroll progress, so its
-          // leading edge sits at x = progress. A marker drawn at x = frac
-          // must therefore fill exactly when progress reaches frac — using
-          // the scroll RANGE (top/denomPx) instead makes the trigger drift
-          // ahead of the marker, so the line visibly sweeps past still-faded
-          // dots (badly so when the note barely scrolls, e.g. folded).
-          frac = top / denomDoc;
+          posFrac = top / denomDoc;
+          fillFrac = top / denomPx;
         } catch (_) {
-          frac = h.position.start.offset / docLen;
+          posFrac = fillFrac = h.position.start.offset / docLen;
         }
       } else {
-        frac = h.position.start.offset / docLen;
+        // Reading mode / notes too short to scroll: char-offset ratio is
+        // the only signal, and with no scroll range to race ahead there is
+        // nothing to split — position and trigger coincide.
+        posFrac = fillFrac = h.position.start.offset / docLen;
       }
-      pts.push({ h, frac: Math.max(0, Math.min(1, frac)) });
+      pts.push({
+        h,
+        posFrac: Math.max(0, Math.min(1, posFrac)),
+        fillFrac: Math.max(0, Math.min(1, fillFrac)),
+      });
     }
 
     // Cluster markers that would sit closer than MIN_GAP_PX at the pane's
@@ -150,22 +179,23 @@ module.exports = class ClaudeScrollMap extends Plugin {
       cluster = [];
     };
     for (const c of pts) {
-      if (!cluster.length || c.frac - cluster[0].frac < minFrac) cluster.push(c);
+      if (!cluster.length || c.posFrac - cluster[0].posFrac < minFrac) cluster.push(c);
       else { flush(); cluster.push(c); }
     }
     flush();
 
-    for (const { h, frac } of kept) {
+    for (const { h, posFrac, fillFrac } of kept) {
       const dot = map.createEl('button', { cls: 'cc-scroll-dot' });
       dot.dataset.level = String(h.level);
       // data-label only — an aria-label would also trigger Obsidian's
       // native black tooltip on top of the styled one
       dot.dataset.label = h.heading;
-      dot.style.left = (frac * 100).toFixed(2) + '%';
-      // The fill animation keys off the marker's own position, so the dot
-      // turns coral the instant the progress line's leading edge reaches it
-      // (clamped so a marker sitting at the very end still triggers).
-      dot.style.setProperty('--cc-dot-frac', Math.min(frac, 0.995).toFixed(4));
+      dot.style.left = (posFrac * 100).toFixed(2) + '%';
+      // The dot turns coral when scroll progress reaches its heading's
+      // arrival point (fillFrac, in scroll-range space — same metric as the
+      // fill bar). Clamped so a marker in the last, unreachable-to-top
+      // screenful still triggers by the time you hit the bottom.
+      dot.style.setProperty('--cc-dot-frac', Math.min(fillFrac, 0.995).toFixed(4));
       if (!Platform.isMobile) {
         dot.addEventListener('click', (evt) => {
           evt.preventDefault();

@@ -1435,8 +1435,18 @@ body.cc-scroll-progress .workspace-leaf-content[data-type="markdown"]
     top: 3px;
     height: 5px;
 }
+/* The leading edge tracks DOCUMENT position, not raw scroll progress: it
+   scales to --cc-fill-max (= range/scrollHeight, set per-view by the
+   companion plugin) so progress×fillMax = scrollTop/scrollHeight. That keeps
+   the edge aligned with the heading dots (which sit in document space) — the
+   line reaches a dot exactly as the dot fills, neither racing ahead nor
+   trailing. The final 5% then snaps to a full bar so the very bottom of the
+   note still reads as 100% (the last screenful has no scroll range of its
+   own to map). Falls back to a plain 0→100% fill when --cc-fill-max is
+   unset (short/reading-mode notes, or any other theme's markup). */
 @keyframes cc-scroll-progress-fill {
     from { transform: scaleX(0); }
+    95%  { transform: scaleX(calc(var(--cc-fill-max, 1) * 0.95)); }
     to   { transform: scaleX(1); }
 }
 /* Mobile: bottom of the visible editor area, a touch thicker; no dots

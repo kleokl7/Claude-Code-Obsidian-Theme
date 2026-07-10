@@ -300,6 +300,13 @@ body {
     --cc-selection:  color-mix(in srgb, var(--cc-accent) 18%, transparent);
     --cc-active-line-bg: color-mix(in srgb, var(--cc-accent) 5%, transparent);
 
+    /* Scroll-map markers. Unread dots fade by opacity over the note bg; on
+       cream that washes them toward beige, so light mode holds more of the
+       coral than dark does. The unread track also needs a darker line than
+       the general border to stay visible on paper. */
+    --cc-dot-fade:    0.6;
+    --cc-track-color: #d9d3c4;
+
     color-scheme: light;
 
     --accent-h: 16;
@@ -401,6 +408,11 @@ body {
     --cc-border-soft:#322f2a;
     --cc-selection:  color-mix(in srgb, var(--cc-accent) 26%, transparent);
     --cc-active-line-bg: color-mix(in srgb, var(--cc-accent) 8%, transparent);
+
+    /* Scroll-map markers: on the dark charcoal a 0.45 coral already reads as
+       a clear dim dot, and the general border works as the unread track. */
+    --cc-dot-fade:    0.45;
+    --cc-track-color: var(--cc-border);
 
     color-scheme: dark;
 
@@ -1395,7 +1407,7 @@ body.cc-scroll-progress .workspace-leaf-content[data-type="markdown"] .view-cont
     top: 0; left: 0;
     width: 100%; height: 15px;
     background:
-        linear-gradient(var(--cc-border), var(--cc-border))
+        linear-gradient(var(--cc-track-color, var(--cc-border)), var(--cc-track-color, var(--cc-border)))
             0 4px / 100% 3px no-repeat,
         linear-gradient(to bottom, var(--cc-bg) 60%, transparent);
     z-index: 8;
@@ -1426,7 +1438,7 @@ body.cc-scroll-progress .workspace-leaf-content[data-type="markdown"]
     .view-content.cc-map-hover::before {
     height: 27px;
     background:
-        linear-gradient(var(--cc-border), var(--cc-border))
+        linear-gradient(var(--cc-track-color, var(--cc-border)), var(--cc-track-color, var(--cc-border)))
             0 3px / 100% 5px no-repeat,
         linear-gradient(to bottom, var(--cc-bg) 60%, transparent);
 }
@@ -1544,7 +1556,7 @@ body .cc-scroll-map .cc-scroll-dot::before {
     inset: 0;
     border-radius: 50%;
     background: var(--cc-dot-color);
-    opacity: 0.45;
+    opacity: var(--cc-dot-fade, 0.45);
     animation: cc-scroll-dot-pass linear both;
     animation-timeline: --cc-note-scroll;
     animation-range:

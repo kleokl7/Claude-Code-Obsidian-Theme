@@ -32,7 +32,7 @@ echo "→ Releasing version: $VERSION"
 
 # versions.json maps each release to its minAppVersion for the community
 # browser — it must know about the version being released.
-if ! grep -q "\"$VERSION\"" versions.json; then
+if ! grep -q "\"$VERSION\"[[:space:]]*:" versions.json; then
     echo "✗ versions.json has no entry for $VERSION — add one (\"$VERSION\": \"<minAppVersion>\")." >&2
     exit 1
 fi

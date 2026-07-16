@@ -1253,16 +1253,25 @@ button.mod-cta { font-weight: 600; }
 
 /* Hide the note title while a heading trail is active (visibility too,
    so the invisible title can't catch clicks meant for the breadcrumb).
-   Asymmetric timing: hiding is immediate, un-hiding waits 160ms — the
-   plugin unmounts the trail for ~a frame while re-rendering it, and
-   without the delay every re-render flashes the title over the trail. */
-body.cc-sticky-in-header:not(.is-mobile) .view-header-title {
+   Both the file-name title AND the parent-folder breadcrumb
+   (.view-header-title-parent, e.g. "Folder / Subfolder /") must go —
+   for a nested note the parent crumb is non-empty and would otherwise
+   collide with the trail. Asymmetric timing: hiding is immediate,
+   un-hiding waits 160ms — the plugin unmounts the trail for ~a frame
+   while re-rendering it, and without the delay every re-render flashes
+   the title over the trail. */
+body.cc-sticky-in-header:not(.is-mobile) .view-header-title,
+body.cc-sticky-in-header:not(.is-mobile) .view-header-title-parent {
     transition: opacity 120ms ease 160ms, visibility 0s linear 160ms;
 }
 body.cc-sticky-in-header:not(.is-mobile)
     .workspace-leaf:has(.sticky-headings-root:not(.sticky-headings-shadow)
         .sticky-headings-item[data-indent-level])
-    .view-header-title {
+    .view-header-title,
+body.cc-sticky-in-header:not(.is-mobile)
+    .workspace-leaf:has(.sticky-headings-root:not(.sticky-headings-shadow)
+        .sticky-headings-item[data-indent-level])
+    .view-header-title-parent {
     opacity: 0;
     visibility: hidden;
     transition: opacity 120ms ease, visibility 0s linear;

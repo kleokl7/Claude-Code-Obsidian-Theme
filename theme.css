@@ -1071,6 +1071,21 @@ body {
    collapsed tables, which squares off the card corners. Grid lines are drawn
    as right/bottom borders per cell (dropped on the last column/row) so they
    still read as single 1px lines against the table's own outer border. */
+
+/* Live Preview tables — color parity via Obsidian's own table variables;
+   no layout/selector overrides (stability). Verified against Obsidian
+   1.12.7: the LP table widget (.cm-embed-block.cm-table-widget) carries
+   .markdown-rendered, so every class rule below already applies to it.
+   The one gap is the stock `thead tr > th` rule, which outranks
+   `.markdown-rendered th` and paints header borders with
+   --table-header-border-color — in BOTH views. Mapping the stock
+   variables to the theme's table tokens closes it everywhere. */
+body {
+    --table-border-color: var(--cc-table-border);
+    --table-header-border-color: var(--cc-table-border);
+    --table-add-button-border-color: var(--cc-table-border);
+}
+
 .markdown-rendered table {
     border-collapse: separate;
     border-spacing: 0;

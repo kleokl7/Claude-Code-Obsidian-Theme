@@ -1,5 +1,5 @@
 /* Claude Scroll Map — structural baseline only.
-   The Claude Code theme restyles all of this (colors, sizes, hollow
+   The Claude Code Orange theme restyles all of this (colors, sizes, hollow
    fill-in, tooltip) with `body`-prefixed selectors that deliberately
    out-rank these; the rules here just keep the plugin usable with any
    theme. */
@@ -11,7 +11,7 @@
   right: 0;
   height: 12px;
   z-index: 10;
-  /* mask scrolled text passing beneath the markers (the Claude Code
+  /* mask scrolled text passing beneath the markers (the Claude Code Orange
      theme replaces this with its own band behind its progress bar) */
   background: linear-gradient(to bottom, var(--background-primary) 60%, transparent);
   transition: height 130ms ease;
@@ -21,7 +21,7 @@
 }
 /* Mobile baseline: hidden. The plugin does render markers on mobile,
    but only a theme that docks them somewhere sensible should show them —
-   the Claude Code theme opts in (bottom-bar, cut-in-half, visual-only). */
+   the Claude Code Orange theme opts in (bottom-bar, cut-in-half, visual-only). */
 body.is-mobile .cc-scroll-map {
   display: none;
 }

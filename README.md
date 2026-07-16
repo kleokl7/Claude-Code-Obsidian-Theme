@@ -55,28 +55,30 @@ Claude's real typefaces (**Styrene B**, **Tiempos Text**, **Galaxie Copernicus**
 | Tiempos Text | **Source Serif 4** | serif reading mode |
 | code face | **JetBrains Mono** | code blocks / inline |
 
-If you own the real fonts and install them on your system, they sit at the front of every font stack and will be used automatically — no config needed. The Google Fonts `@import` requires an internet connection on first load (Obsidian then caches them).
+If you own the real fonts and install them on your system, they sit at the front of every font stack and will be used automatically — no config needed.
+
+The lookalikes load from Google Fonts over the web. This is an intentional tradeoff: the theme stays a single lightweight CSS file with no bundled font payload. The `@import` needs an internet connection on first load (Obsidian usually caches the files afterwards); offline, or with Google's CDN blocked, the theme still works and text falls back to the system fonts in each stack.
 
 ## Install
 
 ### Manually (works today)
 
 1. Download `manifest.json` and `theme.css` from this repo.
-2. In your vault, put them in a folder named exactly **`Claude Code`** inside `.obsidian/themes/`:
+2. In your vault, put them in a folder named exactly **`Claude Code Orange`** inside `.obsidian/themes/`:
    ```
-   <your-vault>/.obsidian/themes/Claude Code/manifest.json
-   <your-vault>/.obsidian/themes/Claude Code/theme.css
+   <your-vault>/.obsidian/themes/Claude Code Orange/manifest.json
+   <your-vault>/.obsidian/themes/Claude Code Orange/theme.css
    ```
-3. In Obsidian: **Settings → Appearance → Themes → Manage → select "Claude Code"**.
+3. In Obsidian: **Settings → Appearance → Themes → Manage → select "Claude Code Orange"**.
 4. Pick a color scheme under **Settings → Appearance → Base color scheme**. Both *Light* and *Dark* are individually tuned.
 
 ### Automatic light/dark switching
 
-Both schemes ship in the theme, so Obsidian can follow your device. Set **Settings → Appearance → Base color scheme → "Adapt to system"** and Obsidian will switch between the Claude Code light and dark palettes automatically with your OS / device light–dark setting — no extra configuration needed.
+Both schemes ship in the theme, so Obsidian can follow your device. Set **Settings → Appearance → Base color scheme → "Adapt to system"** and Obsidian will switch between the theme's light and dark palettes automatically with your OS / device light–dark setting — no extra configuration needed.
 
 ## Options (Style Settings)
 
-Install the community plugin **[Style Settings](https://github.com/mgmeyers/obsidian-style-settings)** to unlock toggles under *Settings → Style Settings → Claude Code*:
+Install the community plugin **[Style Settings](https://github.com/mgmeyers/obsidian-style-settings)** to unlock toggles under *Settings → Style Settings → Claude Code Orange*:
 
 - **Serif reading mode** — switch note body text to the Tiempos-style serif.
 - **Serif headings** / **Monospace headings** — restyle headings.
@@ -96,21 +98,23 @@ All defaults match the Claude Code look, so the theme looks right with the plugi
 Light and dark, side by side — inline title, coral links, warm highlights, the five task states, a framed code card, and a callout:
 
 <p align="center">
-  <img width="49%" src="screenshots/preview-light.png" alt="Claude Code theme — light mode" />
-  <img width="49%" src="screenshots/preview-dark.png" alt="Claude Code theme — dark mode" />
+  <img width="49%" src="screenshots/preview-light.png" alt="Claude Code Orange theme — light mode" />
+  <img width="49%" src="screenshots/preview-dark.png" alt="Claude Code Orange theme — dark mode" />
 </p>
 
 ## Releasing (maintainers)
 
-The Obsidian directory reads GitHub **Releases**, not the repo — it needs a release whose tag exactly matches the `version` in `manifest.json` (no `v` prefix). After bumping that version and committing:
+The Obsidian directory reads GitHub **Releases**, not the repo — it needs a release whose tag exactly matches the `version` in `manifest.json` (no `v` prefix). After bumping that version, adding a matching entry to `versions.json`, and committing:
 
 ```bash
 ./release.sh                       # tags + pushes + creates the release
 ./release.sh --notes "What's new"  # with custom release notes
 ```
 
-The script reads the version from `manifest.json`, refuses to run on a dirty tree or an existing tag, and attaches `theme.css` + `manifest.json` to the release.
+The script reads the version from `manifest.json`, refuses to run on a dirty tree, an existing tag, or a `versions.json` that doesn't know the version, and attaches `theme.css`, `manifest.json` and `versions.json` to the release. Prefer real `--notes` listing user-visible changes over the default line.
 
-## License
+## License & affiliation
 
-MIT. Not affiliated with or endorsed by Anthropic. "Claude" and "Claude Code" are trademarks of Anthropic; this is a community theme that imitates the aesthetic using free, redistributable fonts.
+MIT.
+
+**Claude Code Orange** is an unofficial community theme for Obsidian. Its visual style is inspired by Claude and Claude Code, which are products of Anthropic — but this project is **not affiliated with, endorsed by, or supported by Anthropic**. "Claude" and "Claude Code" are trademarks of Anthropic, PBC. Anthropic's commercial typefaces are not bundled; the theme uses free, redistributable Google Fonts lookalikes instead.

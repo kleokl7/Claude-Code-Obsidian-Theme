@@ -1,11 +1,12 @@
 /* =====================================================================
-   CLAUDE CODE  —  an Obsidian theme
+   CLAUDE CODE ORANGE  —  an Obsidian theme
    ---------------------------------------------------------------------
    A faithful recreation of the look & feel of Claude Code in the Claude
    mobile app: warm cream / charcoal backgrounds, the coral accent,
    Styrene-style grotesque type, and a calm reading rhythm.
 
-   Fonts are free lookalikes for Claude's proprietary typefaces:
+   Fonts are free lookalikes for Claude's proprietary typefaces, loaded
+   from Google Fonts over the web (intentionally not self-hosted):
      • Hanken Grotesk  ≈ Styrene B      (interface + body)
      • Source Serif 4  ≈ Tiempos Text   (optional serif reading mode)
      • JetBrains Mono  ≈ code typeface  (code blocks / inline code)
@@ -22,7 +23,7 @@
    --------------------------------------------------------------------- */
 /* @settings
 
-name: Claude Code
+name: Claude Code Orange
 id: claude-code-theme
 settings:
     -
@@ -519,7 +520,7 @@ body {
 .markdown-rendered .heading-collapse-indicator { color: var(--cc-text-faint); }
 
 /* Active line — a very light tint behind the row the cursor is on.
-   Toggle: Style Settings → Claude Code → Editor → Highlight active line. */
+   Toggle: Style Settings → Claude Code Orange → Editor → Highlight active line. */
 body.cc-active-line .markdown-source-view.mod-cm6 .cm-active.cm-line,
 body.cc-active-line .markdown-source-view.mod-cm6 .cm-active.cm-gutterElement {
     background-color: var(--cc-active-line-bg);

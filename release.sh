@@ -5,8 +5,8 @@
 # The Obsidian directory does NOT read the repo directly — it reads GitHub
 # Releases, and requires a release whose tag EXACTLY equals the version in
 # manifest.json (no "v" prefix). This script reads that version, sanity-
-# checks the repo, then tags + pushes + creates the release with theme.css
-# and manifest.json attached.
+# checks the repo, then tags + pushes + creates the release with theme.css,
+# manifest.json and versions.json attached.
 #
 # Usage:
 #   ./release.sh                 # release the version in manifest.json
@@ -30,6 +30,13 @@ if [[ -z "$VERSION" ]]; then
 fi
 echo "→ Releasing version: $VERSION"
 
+# versions.json maps each release to its minAppVersion for the community
+# browser — it must know about the version being released.
+if ! grep -q "\"$VERSION\"" versions.json; then
+    echo "✗ versions.json has no entry for $VERSION — add one (\"$VERSION\": \"<minAppVersion>\")." >&2
+    exit 1
+fi
+
 # --- Guards ---
 if [[ -n "$(git status --porcelain)" ]]; then
     echo "✗ Working tree is dirty — commit or stash first." >&2
@@ -51,7 +58,7 @@ fi
 git push
 git tag "$VERSION"
 git push origin "$VERSION"
-gh release create "$VERSION" theme.css manifest.json --title "$VERSION" --notes "$NOTES"
+gh release create "$VERSION" theme.css manifest.json versions.json --title "$VERSION" --notes "$NOTES"
 
 echo "✓ Released $VERSION"
 gh release view "$VERSION" --json tagName,url,assets \

@@ -1,6 +1,6 @@
 'use strict';
 
-/* Claude Scroll Map — companion plugin to the Claude Code theme.
+/* Claude Scroll Map — companion plugin to the Claude Code Orange theme.
  *
  * Renders a strip of clickable heading dots (.cc-scroll-map) into every
  * markdown view, positioned by scroll progress. The theme's scroll

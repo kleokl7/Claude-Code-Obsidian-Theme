@@ -1026,26 +1026,34 @@ body {
 
 /* Forwarded / scheduled task `- [>]` — a coral right-chevron in a coral box.
    Text stays normal: the task isn't finished, just deferred to another day.
-   The chevron is a background-image SVG (not a mask) so it renders on mobile;
-   the coral is baked per-theme since background images can't read CSS vars. */
+   The chevron is drawn as a masked ::after (same technique as the H1
+   starburst and Obsidian's own tick) so its color comes from
+   --interactive-accent — the Style Settings accent pickers recolor it.
+   One glyph for both schemes; the SVG's own color is irrelevant (masks
+   read only alpha). Self-sufficient rule: replaces the stock tick
+   (which sits on the same ::after) without relying on its metrics. */
 .markdown-rendered input.task-list-item-checkbox[data-task=">"],
 .markdown-source-view.mod-cm6 input.task-list-item-checkbox[data-task=">"] {
     -webkit-appearance: none;
     appearance: none;
     border: 1.5px solid var(--interactive-accent);
     background-color: var(--background-primary);
-    background-repeat: no-repeat;
-    background-position: center;
-    background-size: 60%;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23c15f3c' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='9 5 16 12 9 19'/%3E%3C/svg%3E");
-}
-.theme-dark .markdown-rendered input.task-list-item-checkbox[data-task=">"],
-.theme-dark .markdown-source-view.mod-cm6 input.task-list-item-checkbox[data-task=">"] {
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23d97757' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='9 5 16 12 9 19'/%3E%3C/svg%3E");
+    background-image: none;
 }
 .markdown-rendered input.task-list-item-checkbox[data-task=">"]::after,
 .markdown-source-view.mod-cm6 input.task-list-item-checkbox[data-task=">"]::after {
-    display: none;
+    content: "";
+    display: block;
+    position: absolute;
+    top: -1px;
+    inset-inline-start: -1px;
+    width: var(--checkbox-size);
+    height: var(--checkbox-size);
+    background-color: var(--interactive-accent);
+    /* Both prefixed + unprefixed shorthands: old engines only honor
+       -webkit-mask; where both parse, the later unprefixed one wins. */
+    -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='9 5 16 12 9 19'/%3E%3C/svg%3E") center / 60% no-repeat;
+    mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='9 5 16 12 9 19'/%3E%3C/svg%3E") center / 60% no-repeat;
 }
 
 /* List bullets: orange marker, normal-colored text */

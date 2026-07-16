@@ -85,7 +85,8 @@ Install the community plugin **[Style Settings](https://github.com/mgmeyers/obsi
 - **Body font size**, **line height**, **readable line length** sliders.
 - **Limit line length** — cap note width at a readable measure even with Obsidian's own "Readable line length" off.
 - **Accent color** pickers for light and dark mode.
-- **Dark mode tuning** — live dials for dark-mode reading comfort: **text brightness**, **text weight** (variable-font aware), and **background darkness** (deepens all dark surfaces together).
+- **Light mode tuning** — live dials for light-mode reading comfort: **text darkness**, **text weight** (variable-font aware), and **background depth** (deepens all cream surfaces together). Defaults reproduce the classic palette exactly.
+- **Dark mode tuning** — the same dials for dark mode: **text brightness**, **text weight**, and **background darkness** (deepens all dark surfaces together).
 - **Loud code blocks** — on (default) gives code blocks a blue frame so they stand out; off keeps them warm, in line with the coral theme.
 - **Highlight active line** — a very light tint behind the editor row your cursor is on (on by default).
 - **Scroll progress bar** — the coral reading-position bar (on by default).

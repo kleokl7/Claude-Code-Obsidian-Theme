@@ -154,6 +154,41 @@ settings:
         type: class-toggle
         default: false
     -
+        id: cc-light-tuning
+        title: Light mode tuning
+        type: heading
+        level: 1
+        collapsed: false
+    -
+        id: cc-light-text-depth
+        title: Text darkness (%)
+        description: Black mixed into light-mode body text. 0 = original warm ink, higher = darker and stronger.
+        type: variable-number-slider
+        default: 0
+        min: 0
+        max: 30
+        step: 1
+        format: '%'
+    -
+        id: cc-light-font-weight
+        title: Text weight
+        description: Light-mode body font weight. Needs a variable font — the bundled Hanken Grotesk and Source Serif 4 both are; static fonts round to the nearest weight.
+        type: variable-number-slider
+        default: 400
+        min: 380
+        max: 500
+        step: 5
+    -
+        id: cc-light-bg-depth
+        title: Background depth (%)
+        description: Black mixed into the light-mode backgrounds. 0 = default warm cream, higher = deeper paper. All light surfaces deepen together so their hierarchy is preserved.
+        type: variable-number-slider
+        default: 0
+        min: 0
+        max: 15
+        step: 1
+        format: '%'
+    -
         id: cc-dark-tuning
         title: Dark mode tuning
         type: heading
@@ -253,6 +288,13 @@ body {
     --cc-dark-font-weight: 430;
     --cc-dark-bg-depth: 0%;
 
+    /* Light-mode tuning dials (Style Settings → Light mode tuning). Same
+       pattern; only consumed inside .theme-light. Defaults reproduce the
+       classic cream palette exactly. */
+    --cc-light-text-depth: 0%;
+    --cc-light-font-weight: 400;
+    --cc-light-bg-depth: 0%;
+
     /* Spacing — Obsidian's defaults (--p-spacing 1rem, --heading-spacing
        ~2.4rem) cut by 50% */
     --p-spacing: 0.5rem;
@@ -287,15 +329,24 @@ body {
     --cc-accent: var(--cc-accent-light);   /* picker-driven base for all tints */
     --cc-link-light: #b0532f;              /* darker coral for link TEXT only — 4.6:1 on cream (AA) */
 
-    --cc-bg:        #f9f3e7;                /* main note surface (warm paper) */
-    --cc-bg-alt:    #f0e9da;                /* sidebars / secondary */
-    --cc-bg-deep:   #e8dfcc;                /* code / inset surfaces */
-    --cc-bg-hover:  #e7decb;
+    /* Backgrounds: warm paper cream, deepened by the "Background depth"
+       dial (0% = the classic cream palette). All four move together so the
+       surface hierarchy is preserved. Muted/faint text stays fixed, which
+       is why the dial caps at 15% — beyond that faint text loses contrast. */
+    --cc-bg:        color-mix(in srgb, black var(--cc-light-bg-depth), #f9f3e7);   /* main note surface (warm paper) */
+    --cc-bg-alt:    color-mix(in srgb, black var(--cc-light-bg-depth), #f0e9da);   /* sidebars / secondary */
+    --cc-bg-deep:   color-mix(in srgb, black var(--cc-light-bg-depth), #e8dfcc);   /* code / inset surfaces */
+    --cc-bg-hover:  color-mix(in srgb, black var(--cc-light-bg-depth), #e7decb);
 
-    --cc-text:       #34322c;               /* warm dark body text */
+    /* Body text: warm dark ink, deepened toward black by the "Text
+       darkness" dial (default 0% = #34322c). */
+    --cc-text:       color-mix(in srgb, black var(--cc-light-text-depth), #34322c);
     --cc-text-muted: #6e6a5c;
     --cc-text-faint: #9a9684;
     --cc-heading:    #1a1915;               /* near-black warm heading */
+
+    /* Dial: "Text weight" (default 400 = unchanged). */
+    --font-weight: var(--cc-light-font-weight);
     --cc-border:     #e6e3d8;
     --cc-border-soft:#efece3;
     --cc-selection:  color-mix(in srgb, var(--cc-accent) 18%, transparent);

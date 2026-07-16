@@ -69,6 +69,15 @@ Prefer variables Mermaid reads if Obsidian exposes them; else node fill
 edges `--graph-line`, text `--cc-text`. Needs explicit `.theme-light` and
 `.theme-dark` sets.
 
+### Tables inside callouts (known niche gap)
+
+Stock Obsidian re-declares `--table-border-color` on `.callout` with a
+callout-tinted mix, which outranks the theme's body-level mapping — so a
+table nested in a callout draws callout-tinted outer/widget borders against
+the theme's warm cell grid (pre-existing behavior, unchanged by the 2026-07
+table work). If it ever matters: re-map the variable on `.callout` too, at
+the cost of stock's callout-tinting design.
+
 ### Popular plugins (only if audience demands)
 
 | Plugin | Direction |
@@ -139,6 +148,7 @@ Remaining when distribution becomes a priority:
 | README badges | latest release + min app version (optional) |
 | Community plugin store | submit Claude Scroll Map only if manual/script install proves insufficient |
 
-Release checklist: bump `manifest.json` → add the version to `versions.json`
-→ update README if options changed → commit clean → `./release.sh --notes "…"`
-→ spot-check installing from the release download, not the working copy.
+The release procedure itself lives in README → *Releasing (maintainers)*
+(release.sh enforces the guards). Roadmap-only additions: update README when
+user-facing options change, and spot-check installing from the release
+download rather than the working copy.

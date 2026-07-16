@@ -306,7 +306,8 @@ body {
     --cc-radius: 12px;
 
     --bold-weight: 700;
-    --font-weight: 400;
+    /* --font-weight is set per scheme: .theme-light and .theme-dark each
+       bind it to their tuning dial (defaults 400 / 430). */
 
     /* File explorer name weights + size (Style-Settings driven) */
     --cc-folder-weight: 700;
@@ -331,8 +332,9 @@ body {
 
     /* Backgrounds: warm paper cream, deepened by the "Background depth"
        dial (0% = the classic cream palette). All four move together so the
-       surface hierarchy is preserved. Muted/faint text stays fixed, which
-       is why the dial caps at 15% — beyond that faint text loses contrast. */
+       surface hierarchy is preserved. Muted/faint text and fixed companions
+       (form fields, scrollbar thumbs, code parchment) don't move with the
+       dial, which is why it caps at 15% — beyond that they drift apart. */
     --cc-bg:        color-mix(in srgb, black var(--cc-light-bg-depth), #f9f3e7);   /* main note surface (warm paper) */
     --cc-bg-alt:    color-mix(in srgb, black var(--cc-light-bg-depth), #f0e9da);   /* sidebars / secondary */
     --cc-bg-deep:   color-mix(in srgb, black var(--cc-light-bg-depth), #e8dfcc);   /* code / inset surfaces */
@@ -1027,18 +1029,21 @@ body {
 /* Forwarded / scheduled task `- [>]` — a coral right-chevron in a coral box.
    Text stays normal: the task isn't finished, just deferred to another day.
    The chevron is drawn as a masked ::after (same technique as the H1
-   starburst and Obsidian's own tick) so its color comes from
-   --interactive-accent — the Style Settings accent pickers recolor it.
-   One glyph for both schemes; the SVG's own color is irrelevant (masks
-   read only alpha). Self-sufficient rule: replaces the stock tick
-   (which sits on the same ::after) without relying on its metrics. */
+   starburst and Obsidian's own tick — which stock also masks on mobile,
+   so parity holds there) and colored by --interactive-accent, so the
+   Style Settings accent pickers recolor it. One glyph for both schemes;
+   the SVG's own color is irrelevant (masks read only alpha). The rule
+   declares the full geometry itself (including the positioning context)
+   so it renders even where the stock :checked::after rule doesn't apply,
+   while deliberately mirroring the stock tick's metrics — re-verify here
+   if a checkbox looks off after an Obsidian update. */
 .markdown-rendered input.task-list-item-checkbox[data-task=">"],
 .markdown-source-view.mod-cm6 input.task-list-item-checkbox[data-task=">"] {
     -webkit-appearance: none;
     appearance: none;
+    position: relative;   /* anchor for the ::after glyph; matches stock */
     border: 1.5px solid var(--interactive-accent);
     background-color: var(--background-primary);
-    background-image: none;
 }
 .markdown-rendered input.task-list-item-checkbox[data-task=">"]::after,
 .markdown-source-view.mod-cm6 input.task-list-item-checkbox[data-task=">"]::after {

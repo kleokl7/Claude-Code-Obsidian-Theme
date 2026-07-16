@@ -31,9 +31,11 @@ fi
 echo "→ Releasing version: $VERSION"
 
 # versions.json maps each release to its minAppVersion for the community
-# browser — it must know about the version being released.
-if ! grep -q "\"$VERSION\"[[:space:]]*:" versions.json; then
-    echo "✗ versions.json has no entry for $VERSION — add one (\"$VERSION\": \"<minAppVersion>\")." >&2
+# browser — it must have an entry for the released version, and that entry
+# must agree with manifest.json's minAppVersion (stale copy-paste guard).
+MINAPP=$(grep -o '"minAppVersion"[[:space:]]*:[[:space:]]*"[^"]*"' manifest.json | head -1 | sed 's/.*"\([^"]*\)"$/\1/')
+if ! grep -q "\"${VERSION//./\\.}\"[[:space:]]*:[[:space:]]*\"${MINAPP//./\\.}\"" versions.json; then
+    echo "✗ versions.json needs the entry \"$VERSION\": \"$MINAPP\" (matching manifest.json's minAppVersion)." >&2
     exit 1
 fi
 

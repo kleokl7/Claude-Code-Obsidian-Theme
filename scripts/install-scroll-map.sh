@@ -26,7 +26,13 @@ done
 # --- Vault path: argument or prompt ---
 VAULT="${1:-}"
 if [[ -z "$VAULT" ]]; then
-    read -r -p "Path to your Obsidian vault: " VAULT
+    # No -r: a drag-and-dropped folder arrives backslash-escaped
+    # ("My\ Vault") and read's backslash handling unescapes it.
+    read -e -p "Path to your Obsidian vault: " VAULT
+fi
+if [[ -z "$VAULT" ]]; then
+    echo "Usage: $0 /path/to/vault" >&2
+    exit 1
 fi
 # Expand a leading ~ (read doesn't)
 VAULT="${VAULT/#\~/$HOME}"

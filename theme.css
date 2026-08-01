@@ -918,8 +918,8 @@ body.cc-loud-code.theme-dark {
 .callout {
     --callout-radius: var(--cc-radius);
     border-radius: var(--cc-radius);
-    border: 1px solid rgba(var(--callout-color), 0.28);
-    background-color: rgba(var(--callout-color), 0.07);
+    border: 1px solid color-mix(in srgb, var(--callout-color) 28%, transparent);
+    background-color: color-mix(in srgb, var(--callout-color) 7%, transparent);
     mix-blend-mode: normal;
     padding: 4px 10px;
     margin: 1em 0;
@@ -928,29 +928,29 @@ body.cc-loud-code.theme-dark {
     padding: 0.5em 0.4em;
     font-weight: 700;
     gap: 0.5em;
-    color: rgb(var(--callout-color));
+    color: var(--callout-color);
 }
-.callout-icon .svg-icon { color: rgb(var(--callout-color)); }
+.callout-icon .svg-icon { color: var(--callout-color); }
 .callout-content { padding: 0 0.4em 0.3em; color: var(--text-normal); }
 /* Callout type colors. Two sets: titles sit directly on the note background,
    so light mode wants deep shades (readable on cream) and dark mode wants
    lifted ones (readable on charcoal) — one shared set fails contrast on one
    side or the other. All pairs reach ~4:1+ on their surface. */
-.callout { --callout-color: 110, 106, 92; }       /* default (quote/abstract/etc.) */
-.callout[data-callout="note"], .callout[data-callout="info"] { --callout-color: 193, 95, 60; }
-.callout[data-callout="tip"],  .callout[data-callout="success"], .callout[data-callout="done"] { --callout-color: 92, 122, 63; }
-.callout[data-callout="warning"], .callout[data-callout="caution"], .callout[data-callout="attention"] { --callout-color: 166, 106, 20; }
-.callout[data-callout="danger"], .callout[data-callout="error"], .callout[data-callout="bug"], .callout[data-callout="failure"] { --callout-color: 178, 56, 44; }
-.callout[data-callout="question"], .callout[data-callout="help"], .callout[data-callout="faq"] { --callout-color: 154, 110, 60; }
-.callout[data-callout="example"] { --callout-color: 120, 100, 150; }
+.callout { --callout-color: rgb(110, 106, 92); }       /* default (quote/abstract/etc.) */
+.callout[data-callout="note"], .callout[data-callout="info"] { --callout-color: rgb(193, 95, 60); }
+.callout[data-callout="tip"],  .callout[data-callout="success"], .callout[data-callout="done"] { --callout-color: rgb(92, 122, 63); }
+.callout[data-callout="warning"], .callout[data-callout="caution"], .callout[data-callout="attention"] { --callout-color: rgb(166, 106, 20); }
+.callout[data-callout="danger"], .callout[data-callout="error"], .callout[data-callout="bug"], .callout[data-callout="failure"] { --callout-color: rgb(178, 56, 44); }
+.callout[data-callout="question"], .callout[data-callout="help"], .callout[data-callout="faq"] { --callout-color: rgb(154, 110, 60); }
+.callout[data-callout="example"] { --callout-color: rgb(120, 100, 150); }
 
-.theme-dark .callout { --callout-color: 168, 164, 150; }
-.theme-dark .callout[data-callout="note"], .theme-dark .callout[data-callout="info"] { --callout-color: 232, 145, 111; }
-.theme-dark .callout[data-callout="tip"], .theme-dark .callout[data-callout="success"], .theme-dark .callout[data-callout="done"] { --callout-color: 143, 182, 107; }
-.theme-dark .callout[data-callout="warning"], .theme-dark .callout[data-callout="caution"], .theme-dark .callout[data-callout="attention"] { --callout-color: 224, 169, 90; }
-.theme-dark .callout[data-callout="danger"], .theme-dark .callout[data-callout="error"], .theme-dark .callout[data-callout="bug"], .theme-dark .callout[data-callout="failure"] { --callout-color: 230, 116, 94; }
-.theme-dark .callout[data-callout="question"], .theme-dark .callout[data-callout="help"], .theme-dark .callout[data-callout="faq"] { --callout-color: 212, 169, 122; }
-.theme-dark .callout[data-callout="example"] { --callout-color: 178, 158, 208; }
+.theme-dark .callout { --callout-color: rgb(168, 164, 150); }
+.theme-dark .callout[data-callout="note"], .theme-dark .callout[data-callout="info"] { --callout-color: rgb(232, 145, 111); }
+.theme-dark .callout[data-callout="tip"], .theme-dark .callout[data-callout="success"], .theme-dark .callout[data-callout="done"] { --callout-color: rgb(143, 182, 107); }
+.theme-dark .callout[data-callout="warning"], .theme-dark .callout[data-callout="caution"], .theme-dark .callout[data-callout="attention"] { --callout-color: rgb(224, 169, 90); }
+.theme-dark .callout[data-callout="danger"], .theme-dark .callout[data-callout="error"], .theme-dark .callout[data-callout="bug"], .theme-dark .callout[data-callout="failure"] { --callout-color: rgb(230, 116, 94); }
+.theme-dark .callout[data-callout="question"], .theme-dark .callout[data-callout="help"], .theme-dark .callout[data-callout="faq"] { --callout-color: rgb(212, 169, 122); }
+.theme-dark .callout[data-callout="example"] { --callout-color: rgb(178, 158, 208); }
 
 /* =====================================================================
    8. LISTS, TASKS, TABLES, HR, TAGS

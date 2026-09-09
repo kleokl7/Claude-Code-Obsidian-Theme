@@ -14,9 +14,45 @@
    front of every stack and will be used automatically.
 
    Works in both Light and Dark. Supports the Style Settings plugin.
+
+   Contents
+     1. Global      fonts, radii, motion, shared tokens
+     2. Color       shared variable mapping, light palette, dark palette
+     3. Typography  headings, body, bold, links
+     4. Type modes  serif body / serif headings / mono headings
+     5. Code        inline pills, framed code cards, syntax palette
+     6. Quotes      blockquotes, callouts
+     7. Lists       tasks, bullets, tables, rules, tags
+     8. Chrome      tabs, explorer, inputs, menus, mobile, settings
+     9. Scroll      progress bar + Claude Scroll Map companion
+    10. Motion      prefers-reduced-motion
    ===================================================================== */
 
 @import url('https://fonts.googleapis.com/css2?family=Hanken+Grotesk:ital,wght@0,300..800;1,300..800&family=Source+Serif+4:ital,opsz,wght@0,8..60,300..700;1,8..60,300..700&family=JetBrains+Mono:ital,wght@0,400..700;1,400..700&display=swap');
+
+/* Metric-matched fallbacks: until the web fonts arrive (first launch, or
+   offline) text is set in a local face scaled to the SAME average glyph
+   width and vertical metrics as the lookalike, so the swap does not
+   reflow the page. Ratios come from the fonts' own tables (Hanken
+   Grotesk vs Arial: 0.4557 / 0.4491 em per glyph; Source Serif 4 vs
+   Georgia: 0.4863 / 0.4474). JetBrains Mono and Menlo already share a
+   0.60em advance, so the mono stack needs no adjustment. */
+@font-face {
+    font-family: "Hanken Grotesk Fallback";
+    src: local("Arial"), local("Liberation Sans"), local("Roboto"), local("Helvetica Neue");
+    size-adjust: 101.5%;
+    ascent-override: 98.5%;
+    descent-override: 29.9%;
+    line-gap-override: 0%;
+}
+@font-face {
+    font-family: "Source Serif 4 Fallback";
+    src: local("Georgia"), local("Noto Serif"), local("Times New Roman");
+    size-adjust: 108.7%;
+    ascent-override: 95.3%;
+    descent-override: 30.8%;
+    line-gap-override: 0%;
+}
 
 /* ---------------------------------------------------------------------
    STYLE SETTINGS  (https://github.com/mgmeyers/obsidian-style-settings)
@@ -241,28 +277,16 @@ settings:
         description: A thin coral bar across the top of the note (bottom of the screen on mobile) showing how far you've scrolled. Pure CSS — pairs with the Claude Scroll Map companion plugin for clickable heading dots.
         type: class-toggle
         default: true
-    -
-        id: cc-plugins
-        title: Plugins
-        type: heading
-        level: 1
-        collapsed: false
-    -
-        id: cc-sticky-in-header
-        title: Sticky headings in the title bar
-        description: With the "Another Sticky Headings" plugin, show the heading trail as a clickable breadcrumb in the note title bar (replacing the note title while you're scrolled into a section) instead of a block above the note. Desktop only — on mobile the plugin keeps its regular stacked view. No effect if the plugin isn't installed.
-        type: class-toggle
-        default: true
 */
 
 /* =====================================================================
-   1. GLOBAL  —  fonts, radii, shared tokens
+   1. GLOBAL  —  fonts, radii, motion, shared tokens
    ===================================================================== */
 body {
     /* --- Font stacks: real Claude fonts first, free lookalikes next --- */
-    --cc-font-sans: "Styrene B", "Styrene A", "Hanken Grotesk", "Schibsted Grotesk",
+    --cc-font-sans: "Styrene B", "Styrene A", "Hanken Grotesk", "Hanken Grotesk Fallback",
         -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-    --cc-font-serif: "Tiempos Text", "Tiempos", "Source Serif 4", "Source Serif Pro",
+    --cc-font-serif: "Tiempos Text", "Tiempos", "Source Serif 4", "Source Serif 4 Fallback",
         Charter, Georgia, "Times New Roman", serif;
     --cc-font-mono: "Söhne Mono", "Berkeley Mono", "JetBrains Mono", "Fira Code",
         ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
@@ -305,6 +329,9 @@ body {
     --radius-m: 10px;
     --cc-radius: 12px;
 
+    /* --- Motion: one tempo for every hover, focus and reveal --- */
+    --cc-motion: 120ms ease;
+
     --bold-weight: 700;
     /* --font-weight is set per scheme: .theme-light and .theme-dark each
        bind it to their tuning dial (defaults 400 / 430). */
@@ -322,103 +349,128 @@ body {
 }
 
 /* =====================================================================
-   2. LIGHT MODE  —  warm paper palette
+   2. COLOR  —  shared mapping, then the light and dark palettes
+   ---------------------------------------------------------------------
+   Every Obsidian variable is bound ONCE to a theme token (--cc-*); the
+   two palette blocks below only set the tokens. The shared block keeps
+   scheme-class specificity on purpose: Obsidian's own .theme-light and
+   .theme-dark rules would outrank a plain `body` selector.
    ===================================================================== */
-.theme-light {
-    --cc-accent-light: #c15f3c;            /* Crail — brand coral for UI elements */
-    --cc-accent-bright: #d97757;           /* Claude coral */
-    --cc-accent: var(--cc-accent-light);   /* picker-driven base for all tints */
-    --cc-link-light: #b0532f;              /* darker coral for link TEXT only — 4.6:1 on cream (AA) */
-
-    /* Backgrounds: warm paper cream, deepened by the "Background depth"
-       dial (0% = the classic cream palette). All four move together so the
-       surface hierarchy is preserved. Muted/faint text and fixed companions
-       (form fields, scrollbar thumbs, code parchment) don't move with the
-       dial, which is why it caps at 15% — beyond that they drift apart. */
-    --cc-bg:        color-mix(in srgb, black var(--cc-light-bg-depth), #f9f3e7);   /* main note surface (warm paper) */
-    --cc-bg-alt:    color-mix(in srgb, black var(--cc-light-bg-depth), #f0e9da);   /* sidebars / secondary */
-    --cc-bg-deep:   color-mix(in srgb, black var(--cc-light-bg-depth), #e8dfcc);   /* code / inset surfaces */
-    --cc-bg-hover:  color-mix(in srgb, black var(--cc-light-bg-depth), #e7decb);
-
-    /* Body text: warm dark ink, deepened toward black by the "Text
-       darkness" dial (default 0% = #34322c). */
-    --cc-text:       color-mix(in srgb, black var(--cc-light-text-depth), #34322c);
-    --cc-text-muted: #6e6a5c;
-    --cc-text-faint: #9a9684;
-    --cc-heading:    #1a1915;               /* near-black warm heading */
-
-    /* Dial: "Text weight" (default 400 = unchanged). */
-    --font-weight: var(--cc-light-font-weight);
-    --cc-border:     #e6e3d8;
-    --cc-border-soft:#efece3;
-    --cc-selection:  color-mix(in srgb, var(--cc-accent) 18%, transparent);
-    --cc-active-line-bg: color-mix(in srgb, var(--cc-accent) 5%, transparent);
-
-    /* Scroll-map markers. Unread dots fade by opacity over the note bg; on
-       cream that washes them toward beige, so light mode holds more of the
-       coral than dark does. The unread track also needs a darker line than
-       the general border to stay visible on paper. */
-    --cc-dot-fade:    0.6;
-    --cc-track-color: #d9d3c4;
-
-    color-scheme: light;
-
-    --accent-h: 16;
-    --accent-s: 56%;
-    --accent-l: 50%;
-
+.theme-light, .theme-dark {
     --background-primary:        var(--cc-bg);
-    --background-primary-alt:     var(--cc-bg-alt);
-    --background-secondary:       var(--cc-bg-alt);
-    --background-secondary-alt:   var(--cc-bg-deep);
-    --background-modifier-hover:  var(--cc-bg-hover);
+    --background-primary-alt:    var(--cc-bg-alt);
+    --background-secondary:      var(--cc-bg-alt);
+    --background-secondary-alt:  var(--cc-bg-deep);
+    --background-modifier-hover: var(--cc-bg-hover);
     --background-modifier-active-hover: var(--cc-selection);
-    --background-modifier-border: var(--cc-border);
-    --background-modifier-border-hover: #dcd8cc;
-    --background-modifier-border-focus: var(--cc-accent-light);
-    --background-modifier-form-field: #fffdf7;
+    --background-modifier-border:       var(--cc-border);
+    --background-modifier-border-focus: var(--cc-accent);
+    --background-modifier-message:      var(--cc-tooltip-bg);   /* tooltips, notices */
 
-    --text-normal:   var(--cc-text);
-    --text-muted:    var(--cc-text-muted);
-    --text-faint:    var(--cc-text-faint);
-    --text-on-accent: #fffaf5;
-    --text-accent:   var(--cc-link-light);   /* AA-safe link text; brand coral stays on UI elements */
-    --text-accent-hover: var(--cc-accent-bright);
+    --text-normal:    var(--cc-text);
+    --text-muted:     var(--cc-text-muted);
+    --text-faint:     var(--cc-text-faint);
     --text-selection: var(--cc-selection);
-    --text-highlight-bg: color-mix(in srgb, var(--cc-accent) 22%, transparent);
 
-    --interactive-accent:        var(--cc-accent-light);
-    --interactive-accent-hover:  var(--cc-accent-bright);
-    --interactive-normal:        var(--cc-bg-alt);
-    --interactive-hover:         var(--cc-bg-hover);
+    --interactive-accent:       var(--cc-accent);
+    --interactive-accent-hover: var(--cc-accent-bright);
+    --interactive-normal:       var(--cc-bg-alt);
+    --interactive-hover:        var(--cc-bg-hover);
 
-    --titlebar-background:        var(--cc-bg-alt);
-    --titlebar-background-focused:var(--cc-bg-alt);
-    --tab-background-active:      color-mix(in srgb, var(--cc-accent) 16%, var(--cc-bg));
+    --titlebar-background:         var(--cc-bg-alt);
+    --titlebar-background-focused: var(--cc-bg-alt);
+    --tab-background-active: color-mix(in srgb, var(--cc-accent) 16%, var(--cc-bg));
+
+    /* Floating surfaces share the note's corner radius and border */
+    --modal-radius:        var(--cc-radius);
+    --modal-border-color:  var(--cc-border);
+    --menu-radius:         var(--radius-m);
+    --menu-border-color:   var(--cc-border);
+    --prompt-border-color: var(--cc-border);
+
+    /* Unresolved links: same coral, faded, dotted (see Typography) */
+    --link-unresolved-color:   var(--text-accent);
+    --link-unresolved-opacity: 0.65;
+    --link-unresolved-filter:  none;
+    --link-unresolved-decoration-style: dotted;
+    --link-unresolved-decoration-color: color-mix(in srgb, var(--cc-accent) 60%, transparent);
 
     --quote-opacity: 1;
     --hr-color: var(--cc-border);
-    --tag-color: var(--cc-accent-light);
-    --tag-background: color-mix(in srgb, var(--cc-accent) 12%, transparent);
+    --blockquote-background-color: transparent;
+    --code-background: var(--cc-code-bg);
+    --code-normal:     var(--cc-code-text);
+    --list-marker-color: var(--cc-accent);
+    --bold-color:   var(--cc-heading);
+    --italic-color: inherit;
+    --metadata-label-text-color: var(--cc-text-muted);
+
+    /* Table grid — Obsidian's stock `thead tr > th` rule outranks class
+       selectors and paints header borders from these variables (verified
+       1.12.7, both views); mapping them closes the gap everywhere. */
+    --table-border-color:            var(--cc-table-border);
+    --table-header-border-color:     var(--cc-table-border);
+    --table-add-button-border-color: var(--cc-table-border);
+}
+
+/* --- Light: warm paper ------------------------------------------------ */
+.theme-light {
+    color-scheme: light;
+    --accent-h: 16; --accent-s: 56%; --accent-l: 50%;
+
+    --cc-accent-light: #c15f3c;            /* Crail — brand coral for UI elements */
+    --cc-accent-bright: #d97757;           /* Claude coral */
+    --cc-accent: var(--cc-accent-light);   /* picker-driven base for all tints */
+    --cc-link-light: #b0532f;              /* darker coral for link TEXT — 4.6:1 on cream (AA) */
+
+    /* Surfaces, deepened together by the "Background depth" dial (0% =
+       the classic cream). Fixed companions (form fields, scrollbars, code
+       parchment) don't move with it, which is why the dial caps at 15%. */
+    --cc-bg:        color-mix(in srgb, black var(--cc-light-bg-depth), #f9f3e7);   /* note surface */
+    --cc-bg-alt:    color-mix(in srgb, black var(--cc-light-bg-depth), #f0e9da);   /* sidebars */
+    --cc-bg-deep:   color-mix(in srgb, black var(--cc-light-bg-depth), #e8dfcc);   /* insets */
+    --cc-bg-hover:  color-mix(in srgb, black var(--cc-light-bg-depth), #e7decb);
+
+    /* Ink, deepened toward black by the "Text darkness" dial (0% = #34322c) */
+    --cc-text:       color-mix(in srgb, black var(--cc-light-text-depth), #34322c);
+    --cc-text-muted: #6e6a5c;
+    --cc-text-faint: #9a9684;
+    --cc-heading:    #1a1915;
+    --font-weight:   var(--cc-light-font-weight);   /* "Text weight" dial */
+
+    --cc-border:      #e6e3d8;
+    --cc-border-soft: #efece3;
+    --cc-selection:      color-mix(in srgb, var(--cc-accent) 18%, transparent);
+    --cc-active-line-bg: color-mix(in srgb, var(--cc-accent) 5%, transparent);
+    --cc-tooltip-bg:  #2a2825;              /* warm near-black under white text */
+
+    /* Scroll-map: on cream an opacity fade washes toward beige, so light
+       mode keeps more coral, and the unread track needs a darker line. */
+    --cc-dot-fade:    0.6;
+    --cc-track-color: #d9d3c4;
+
+    --background-modifier-border-hover: #dcd8cc;
+    --background-modifier-form-field:   #fffdf7;
+    --text-on-accent:    #fffaf5;
+    --text-accent:       var(--cc-link-light);   /* AA-safe link text */
+    --text-accent-hover: var(--cc-accent-bright);
+    --text-highlight-bg: color-mix(in srgb, var(--cc-accent) 22%, transparent);
+    --tag-color:            var(--cc-accent);
+    --tag-background:       color-mix(in srgb, var(--cc-accent) 12%, transparent);
     --tag-background-hover: color-mix(in srgb, var(--cc-accent) 20%, transparent);
     --blockquote-border-color: var(--cc-accent-bright);
-    --blockquote-background-color: transparent;
-    --scrollbar-thumb-bg: rgba(52, 50, 44, 0.16);
+    --scrollbar-thumb-bg:        rgba(52, 50, 44, 0.16);
     --scrollbar-active-thumb-bg: rgba(52, 50, 44, 0.32);
 
     /* Code frame — warm by default; "Loud code blocks" switches it to blue */
-    --cc-code-bg:     #f0e8d6;              /* warm parchment inset */
+    --cc-code-bg:     #f0e8d6;
     --cc-code-border: #e1d5bd;
-    --cc-code-text:   #5c4f3b;              /* warm code text */
-    --code-background: var(--cc-code-bg);
-    --code-normal: var(--cc-code-text);
+    --cc-code-text:   #5c4f3b;
 
-    --list-marker-color: var(--cc-accent-light);  /* orange bullets */
-    --cc-table-bg:     #f7f1e5;             /* table body — quiet warm */
+    --cc-table-bg:     #f7f1e5;             /* body — quiet warm */
     --cc-table-header: #f1dcc4;             /* header — keeps the orange */
-    --cc-table-border: #e6dcc9;             /* soft, muted grid lines */
+    --cc-table-border: #e6dcc9;
 
-    /* Graph view — coral nodes, clearly visible warm links */
     --graph-line:             #c0ad93;
     --graph-node:             #c15f3c;
     --graph-node-focused:     #d97757;
@@ -426,106 +478,64 @@ body {
     --graph-node-attachment:  #b3a78e;
     --graph-node-unresolved:  #bcb4a2;
     --graph-text:             #34322c;
-
-    --bold-color: var(--cc-heading);
-    --italic-color: inherit;
-    --metadata-label-text-color: var(--cc-text-muted);
 }
 
-/* =====================================================================
-   3. DARK MODE  —  warm charcoal palette
-   ===================================================================== */
+/* --- Dark: warm charcoal ---------------------------------------------- */
 .theme-dark {
+    color-scheme: dark;
+    --accent-h: 16; --accent-s: 62%; --accent-l: 59%;
+
     --cc-accent-dark:   #d97757;            /* Claude coral */
     --cc-accent-bright: #e8916f;            /* lifted coral for links on dark */
     --cc-accent: var(--cc-accent-dark);    /* picker-driven base for all tints */
 
-    /* Backgrounds: warm charcoal, deepened by the "Background darkness"
-       dial (0% = the classic Claude palette). All four move together so
-       the surface hierarchy is preserved. */
-    --cc-bg:        color-mix(in srgb, black var(--cc-dark-bg-depth), #262624);   /* main note surface */
-    --cc-bg-alt:    color-mix(in srgb, black var(--cc-dark-bg-depth), #1f1e1d);   /* sidebars / secondary */
-    --cc-bg-deep:   color-mix(in srgb, black var(--cc-dark-bg-depth), #1a1917);   /* code / inset surfaces */
+    /* Surfaces, deepened together by the "Background darkness" dial */
+    --cc-bg:        color-mix(in srgb, black var(--cc-dark-bg-depth), #262624);   /* note surface */
+    --cc-bg-alt:    color-mix(in srgb, black var(--cc-dark-bg-depth), #1f1e1d);   /* sidebars */
+    --cc-bg-deep:   color-mix(in srgb, black var(--cc-dark-bg-depth), #1a1917);   /* insets */
     --cc-bg-hover:  color-mix(in srgb, black var(--cc-dark-bg-depth), #302f2c);
 
-    /* Body text: warm off-white base, lifted toward white by the "Text
-       brightness" dial (default 15% ≈ #eae8e0). */
-    --cc-text: color-mix(in srgb, white var(--cc-dark-text-bright), #e6e4dc);
+    /* Off-white, lifted toward white by the "Text brightness" dial
+       (default 15% ≈ #eae8e0). Light-on-dark reads thinner than
+       dark-on-light, so the weight dial defaults past 400. */
+    --cc-text:       color-mix(in srgb, white var(--cc-dark-text-bright), #e6e4dc);
     --cc-text-muted: #a8a496;
     --cc-text-faint: #767264;
-    --cc-heading:    #f6f4ee;               /* bright warm heading */
+    --cc-heading:    #f6f4ee;
+    --font-weight:   var(--cc-dark-font-weight);
 
-    /* Light-on-dark reads thinner than dark-on-light; a variable-font nudge
-       past 400 compensates. Dial: "Text weight". */
-    --font-weight: var(--cc-dark-font-weight);
-    --cc-border:     #393833;
-    --cc-border-soft:#322f2a;
-    --cc-selection:  color-mix(in srgb, var(--cc-accent) 26%, transparent);
+    --cc-border:      #393833;
+    --cc-border-soft: #322f2a;
+    --cc-selection:      color-mix(in srgb, var(--cc-accent) 26%, transparent);
     --cc-active-line-bg: color-mix(in srgb, var(--cc-accent) 8%, transparent);
+    --cc-tooltip-bg:  #3d3b36;              /* lifted warm surface under white text */
 
-    /* Scroll-map markers: on the dark charcoal a 0.45 coral already reads as
-       a clear dim dot, and the general border works as the unread track. */
+    /* Scroll-map: 0.45 coral already reads as a dim dot on charcoal */
     --cc-dot-fade:    0.45;
     --cc-track-color: var(--cc-border);
 
-    color-scheme: dark;
-
-    --accent-h: 16;
-    --accent-s: 62%;
-    --accent-l: 59%;
-
-    --background-primary:        var(--cc-bg);
-    --background-primary-alt:     var(--cc-bg-alt);
-    --background-secondary:       var(--cc-bg-alt);
-    --background-secondary-alt:   var(--cc-bg-deep);
-    --background-modifier-hover:  var(--cc-bg-hover);
-    --background-modifier-active-hover: var(--cc-selection);
-    --background-modifier-border: var(--cc-border);
     --background-modifier-border-hover: #4a4942;
-    --background-modifier-border-focus: var(--cc-accent-dark);
-    --background-modifier-form-field: #1c1b19;
-
-    --text-normal:   var(--cc-text);
-    --text-muted:    var(--cc-text-muted);
-    --text-faint:    var(--cc-text-faint);
-    --text-on-accent: #1a1915;
-    --text-accent:   var(--cc-accent-bright);
+    --background-modifier-form-field:   #1c1b19;
+    --text-on-accent:    #1a1915;
+    --text-accent:       var(--cc-accent-bright);
     --text-accent-hover: #f2a587;
-    --text-selection: var(--cc-selection);
     --text-highlight-bg: color-mix(in srgb, var(--cc-accent) 28%, transparent);
-
-    --interactive-accent:        var(--cc-accent-dark);
-    --interactive-accent-hover:  var(--cc-accent-bright);
-    --interactive-normal:        var(--cc-bg-alt);
-    --interactive-hover:         var(--cc-bg-hover);
-
-    --titlebar-background:        var(--cc-bg-alt);
-    --titlebar-background-focused:var(--cc-bg-alt);
-    --tab-background-active:      color-mix(in srgb, var(--cc-accent) 16%, var(--cc-bg));
-
-    --quote-opacity: 1;
-    --hr-color: var(--cc-border);
-    --tag-color: var(--cc-accent-bright);
-    --tag-background: color-mix(in srgb, var(--cc-accent) 16%, transparent);
+    --tag-color:            var(--cc-accent-bright);
+    --tag-background:       color-mix(in srgb, var(--cc-accent) 16%, transparent);
     --tag-background-hover: color-mix(in srgb, var(--cc-accent) 26%, transparent);
-    --blockquote-border-color: var(--cc-accent-dark);
-    --blockquote-background-color: transparent;
-    --scrollbar-thumb-bg: rgba(230, 228, 220, 0.16);
+    --blockquote-border-color: var(--cc-accent);
+    --scrollbar-thumb-bg:        rgba(230, 228, 220, 0.16);
     --scrollbar-active-thumb-bg: rgba(230, 228, 220, 0.3);
 
     /* Code frame — warm by default; "Loud code blocks" switches it to blue */
-    --cc-code-bg:     #1f1b15;              /* warm dark inset */
+    --cc-code-bg:     #1f1b15;
     --cc-code-border: #382f23;
-    --cc-code-text:   #d8cbb3;              /* warm code text */
-    --code-background: var(--cc-code-bg);
-    --code-normal: var(--cc-code-text);
+    --cc-code-text:   #d8cbb3;
 
-    --list-marker-color: var(--cc-accent-dark);   /* orange bullets */
-    --cc-table-bg:     #2b2824;             /* table body — quiet warm lift */
-    --cc-table-header: #3a3128;             /* header — clean warm (not muddy) */
-    --cc-table-border: #423a2f;             /* soft, muted grid lines */
+    --cc-table-bg:     #2b2824;             /* body — quiet warm lift */
+    --cc-table-header: #3a3128;             /* header — clean warm */
+    --cc-table-border: #423a2f;
 
-    /* Graph view — salmon nodes, clearly visible links on charcoal */
     --graph-line:             #5f594f;
     --graph-node:             #e8916f;
     --graph-node-focused:     #f0a487;
@@ -533,14 +543,10 @@ body {
     --graph-node-attachment:  #6f685d;
     --graph-node-unresolved:  #6e685d;
     --graph-text:             #e6e4dc;
-
-    --bold-color: var(--cc-heading);
-    --italic-color: inherit;
-    --metadata-label-text-color: var(--cc-text-muted);
 }
 
 /* =====================================================================
-   4. TYPOGRAPHY  —  headings, body, bold, italics, links
+   3. TYPOGRAPHY  —  headings, body, bold, italics, links
    ===================================================================== */
 
 /* Headings: tight, confident, like Claude's response titles */
@@ -566,7 +572,7 @@ body {
 :is(.markdown-rendered, .markdown-source-view) h5,
 .HyperMD-header-5 { --h5-size: 0.95em; text-transform: uppercase; letter-spacing: 0.06em; color: var(--cc-text-muted); }
 :is(.markdown-rendered, .markdown-source-view) h6,
-.HyperMD-header-6 { --h6-size: 0.88em; text-transform: uppercase; letter-spacing: 0.06em; color: var(--cc-text-faint); }
+.HyperMD-header-6 { --h6-size: 0.88em; text-transform: uppercase; letter-spacing: 0.06em; color: var(--cc-text-muted); }
 
 /* The # markers stay quietly out of the way */
 .HyperMD-header .cm-formatting-header,
@@ -644,7 +650,7 @@ body {
 .markdown-rendered a,
 .cm-link, .cm-url {
     color: var(--text-accent);
-    transition: color 120ms ease, text-decoration-color 120ms ease;
+    transition: color var(--cc-motion), text-decoration-color var(--cc-motion);
 }
 .markdown-rendered a:hover,
 .cm-link:hover, .cm-url:hover {
@@ -662,31 +668,36 @@ body {
 }
 a.external-link { background-image: none; padding-right: 0; }
 
-/* Internal / page links: bold + orange, never underlined (reading + edit) */
+/* Internal / page links: bold + coral, never underlined (reading + edit).
+   !important so no stock or plugin rule can silently re-underline them;
+   with !important in play the shortest selector is enough. */
 a.internal-link,
-a.internal-link.is-unresolved,
-.markdown-rendered a.internal-link,
-.markdown-preview-view a.internal-link,
-.cm-hmd-internal-link,
-.cm-s-obsidian .cm-hmd-internal-link {
+.cm-hmd-internal-link {
     font-weight: 700 !important;
     color: var(--text-accent) !important;
-    text-decoration: none !important;
 }
-/* The span Obsidian uses to draw the internal-link underline in live preview */
-.cm-s-obsidian .cm-underline,
-.markdown-rendered a.internal-link .cm-underline {
+a.internal-link:not(.is-unresolved),
+.cm-hmd-internal-link,
+.cm-underline:not(.is-unresolved .cm-underline) {   /* LP draws its underline on this span */
     text-decoration: none !important;
 }
 a.internal-link:hover,
-.markdown-rendered a.internal-link:hover,
 .cm-hmd-internal-link:hover {
     color: var(--text-accent-hover) !important;
-    text-decoration: none !important;
+}
+/* Unresolved links — the note doesn't exist yet. Same coral, but faded
+   with a dotted underline, so a link that leads nowhere is visible at a
+   glance. Opacity and dotting come from Obsidian's own --link-unresolved-*
+   variables (bound in section 2); these two rules only restore the
+   underline line that the theme removes on resolved links. */
+.markdown-rendered a.internal-link.is-unresolved,
+.cm-s-obsidian .cm-hmd-internal-link .is-unresolved .cm-underline {   /* LP: .is-unresolved wraps the underline span */
+    text-decoration-line: underline;
+    text-underline-offset: 0.18em;
 }
 
 /* =====================================================================
-   5. SERIF READING MODE  (Style Settings toggles)
+   4. TYPE MODES  —  serif body, serif headings, mono headings
    ===================================================================== */
 body.claude-serif-body {
     --font-text-theme: var(--cc-font-serif);
@@ -710,7 +721,7 @@ body.claude-mono-headings :is(.markdown-rendered h1, .markdown-rendered h2,
 }
 
 /* =====================================================================
-   6. CODE  —  the heart of Claude Code
+   5. CODE  —  the heart of Claude Code
    ===================================================================== */
 
 /* "Loud code blocks" (Style Settings, on by default): blue frame + text so
@@ -809,36 +820,37 @@ body.cc-loud-code.theme-dark {
     top: 2.2em; left: 1.1em; right: 1.1em;
     border-top: 1px solid var(--cc-code-border);
 }
-/* Common language labels */
-.markdown-rendered pre.language-javascript::before, .markdown-rendered pre.language-js::before { content: "javascript"; }
-.markdown-rendered pre.language-typescript::before, .markdown-rendered pre.language-ts::before { content: "typescript"; }
+/* Common language labels (a class name can't be read by attr(), so the
+   map is explicit; anything not listed shows the generic "code") */
+.markdown-rendered pre:is(.language-javascript, .language-js)::before { content: "javascript"; }
+.markdown-rendered pre:is(.language-typescript, .language-ts)::before { content: "typescript"; }
 .markdown-rendered pre.language-jsx::before { content: "jsx"; }
 .markdown-rendered pre.language-tsx::before { content: "tsx"; }
-.markdown-rendered pre.language-python::before, .markdown-rendered pre.language-py::before { content: "python"; }
-.markdown-rendered pre.language-bash::before, .markdown-rendered pre.language-sh::before, .markdown-rendered pre.language-shell::before, .markdown-rendered pre.language-zsh::before { content: "shell"; }
+.markdown-rendered pre:is(.language-python, .language-py)::before { content: "python"; }
+.markdown-rendered pre:is(.language-bash, .language-sh, .language-shell, .language-zsh)::before { content: "shell"; }
 .markdown-rendered pre.language-json::before { content: "json"; }
-.markdown-rendered pre.language-yaml::before, .markdown-rendered pre.language-yml::before { content: "yaml"; }
+.markdown-rendered pre:is(.language-yaml, .language-yml)::before { content: "yaml"; }
 .markdown-rendered pre.language-toml::before { content: "toml"; }
-.markdown-rendered pre.language-html::before, .markdown-rendered pre.language-xml::before { content: "html"; }
-.markdown-rendered pre.language-css::before, .markdown-rendered pre.language-scss::before { content: "css"; }
+.markdown-rendered pre:is(.language-html, .language-xml)::before { content: "html"; }
+.markdown-rendered pre:is(.language-css, .language-scss)::before { content: "css"; }
 .markdown-rendered pre.language-java::before { content: "java"; }
 .markdown-rendered pre.language-c::before { content: "c"; }
 .markdown-rendered pre.language-cpp::before { content: "c++"; }
-.markdown-rendered pre.language-csharp::before, .markdown-rendered pre.language-cs::before { content: "c#"; }
+.markdown-rendered pre:is(.language-csharp, .language-cs)::before { content: "c#"; }
 .markdown-rendered pre.language-go::before { content: "go"; }
-.markdown-rendered pre.language-rust::before, .markdown-rendered pre.language-rs::before { content: "rust"; }
-.markdown-rendered pre.language-ruby::before, .markdown-rendered pre.language-rb::before { content: "ruby"; }
+.markdown-rendered pre:is(.language-rust, .language-rs)::before { content: "rust"; }
+.markdown-rendered pre:is(.language-ruby, .language-rb)::before { content: "ruby"; }
 .markdown-rendered pre.language-php::before { content: "php"; }
 .markdown-rendered pre.language-sql::before { content: "sql"; }
-.markdown-rendered pre.language-markdown::before, .markdown-rendered pre.language-md::before { content: "markdown"; }
+.markdown-rendered pre:is(.language-markdown, .language-md)::before { content: "markdown"; }
 .markdown-rendered pre.language-dockerfile::before { content: "dockerfile"; }
 .markdown-rendered pre.language-kotlin::before { content: "kotlin"; }
 .markdown-rendered pre.language-swift::before { content: "swift"; }
 .markdown-rendered pre.language-diff::before { content: "diff"; }
 .markdown-rendered pre.language-ini::before { content: "ini"; }
 .markdown-rendered pre.language-lua::before { content: "lua"; }
-.markdown-rendered pre.language-powershell::before, .markdown-rendered pre.language-ps1::before { content: "powershell"; }
-.markdown-rendered pre.language-text::before, .markdown-rendered pre.language-plaintext::before, .markdown-rendered pre.language-txt::before { content: "text"; }
+.markdown-rendered pre:is(.language-powershell, .language-ps1)::before { content: "powershell"; }
+.markdown-rendered pre:is(.language-text, .language-plaintext, .language-txt)::before { content: "text"; }
 
 .markdown-rendered button.copy-code-button {
     top: 0.5em;
@@ -850,7 +862,7 @@ body.cc-loud-code.theme-dark {
     padding: 0.2em 0.55em;
     font-size: 0.74em;
     opacity: 0;
-    transition: opacity 120ms ease, color 120ms ease;
+    transition: opacity var(--cc-motion), color var(--cc-motion);
 }
 .markdown-rendered pre:hover button.copy-code-button,
 .markdown-rendered button.copy-code-button:focus-visible { opacity: 1; }
@@ -903,7 +915,7 @@ body.cc-loud-code.theme-dark {
 .cm-s-obsidian span.cm-tag { color: var(--code-tag); }
 
 /* =====================================================================
-   7. BLOCKQUOTES & CALLOUTS
+   6. BLOCKQUOTES & CALLOUTS
    ===================================================================== */
 .markdown-rendered blockquote {
     border-left: 3px solid var(--blockquote-border-color);
@@ -953,7 +965,7 @@ body.cc-loud-code.theme-dark {
 .theme-dark .callout[data-callout="example"] { --callout-color: 178, 158, 208; }
 
 /* =====================================================================
-   8. LISTS, TASKS, TABLES, HR, TAGS
+   7. LISTS, TASKS, TABLES, HR, TAGS
    ===================================================================== */
 
 /* Task checkboxes — coral box with a white tick when done.
@@ -974,6 +986,15 @@ body {
     --checklist-done-color: var(--cc-text-faint);
     --checklist-done-decoration: line-through;
 }
+/* Selector shape for the custom states below: stock Obsidian mirrors
+   data-task onto the <input>, but the Tasks plugin re-renders reading-view
+   items with data-task on the <li> only — and flags every non-empty state
+   is-checked, which would tick and strike them. Both DOM shapes are
+   matched, and the strike is lifted for states that are not "done". */
+.markdown-rendered .task-list-item.is-checked:is([data-task="/"], [data-task=">"]) {
+    color: inherit;
+    text-decoration: none;
+}
 
 /* In-progress task `- [/]` — a half-filled coral box, no tick.
    The diagonal fill echoes the slash you type and reads instantly as
@@ -982,8 +1003,7 @@ body {
    explicit appearance reset (prefixed + unprefixed) so the custom fill
    shows on mobile too, where Obsidian otherwise falls back to a native
    glyph. Custom data-task states aren't "done", so the text stays normal. */
-.markdown-rendered input.task-list-item-checkbox[data-task="/"],
-.markdown-source-view.mod-cm6 input.task-list-item-checkbox[data-task="/"] {
+:is(.markdown-rendered, .markdown-source-view.mod-cm6) :is(input[data-task="/"], [data-task="/"] > input).task-list-item-checkbox {
     -webkit-appearance: none;
     appearance: none;
     border: 1.5px solid var(--interactive-accent);
@@ -993,8 +1013,7 @@ body {
         transparent 50%);
 }
 /* Suppress Obsidian's native tick for the in-progress state */
-.markdown-rendered input.task-list-item-checkbox[data-task="/"]::after,
-.markdown-source-view.mod-cm6 input.task-list-item-checkbox[data-task="/"]::after {
+:is(.markdown-rendered, .markdown-source-view.mod-cm6) :is(input[data-task="/"], [data-task="/"] > input).task-list-item-checkbox::after {
     display: none;
 }
 
@@ -1002,8 +1021,7 @@ body {
    faded text. Deliberately greyscale (no coral) so it reads as "dropped",
    never as "done". Obsidian only strikes x/X items, so the text styling here
    is applied by hand. */
-.markdown-rendered input.task-list-item-checkbox[data-task="-"],
-.markdown-source-view.mod-cm6 input.task-list-item-checkbox[data-task="-"] {
+:is(.markdown-rendered, .markdown-source-view.mod-cm6) :is(input[data-task="-"], [data-task="-"] > input).task-list-item-checkbox {
     -webkit-appearance: none;
     appearance: none;
     border: 1.5px solid var(--cc-text-faint);
@@ -1016,8 +1034,7 @@ body {
         var(--cc-text-muted) 44% 56%,
         transparent 56%);
 }
-.markdown-rendered input.task-list-item-checkbox[data-task="-"]::after,
-.markdown-source-view.mod-cm6 input.task-list-item-checkbox[data-task="-"]::after {
+:is(.markdown-rendered, .markdown-source-view.mod-cm6) :is(input[data-task="-"], [data-task="-"] > input).task-list-item-checkbox::after {
     display: none;
 }
 .markdown-rendered .task-list-item[data-task="-"],
@@ -1037,16 +1054,14 @@ body {
    so it renders even where the stock :checked::after rule doesn't apply,
    while deliberately mirroring the stock tick's metrics — re-verify here
    if a checkbox looks off after an Obsidian update. */
-.markdown-rendered input.task-list-item-checkbox[data-task=">"],
-.markdown-source-view.mod-cm6 input.task-list-item-checkbox[data-task=">"] {
+:is(.markdown-rendered, .markdown-source-view.mod-cm6) :is(input[data-task=">"], [data-task=">"] > input).task-list-item-checkbox {
     -webkit-appearance: none;
     appearance: none;
     position: relative;   /* anchor for the ::after glyph; matches stock */
     border: 1.5px solid var(--interactive-accent);
     background-color: var(--background-primary);
 }
-.markdown-rendered input.task-list-item-checkbox[data-task=">"]::after,
-.markdown-source-view.mod-cm6 input.task-list-item-checkbox[data-task=">"]::after {
+:is(.markdown-rendered, .markdown-source-view.mod-cm6) :is(input[data-task=">"], [data-task=">"] > input).task-list-item-checkbox::after {
     content: "";
     display: block;
     position: absolute;
@@ -1077,20 +1092,10 @@ body {
    as right/bottom borders per cell (dropped on the last column/row) so they
    still read as single 1px lines against the table's own outer border. */
 
-/* Live Preview tables — color parity via Obsidian's own table variables;
-   no layout/selector overrides (stability). Verified against Obsidian
-   1.12.7: the LP table widget (.cm-embed-block.cm-table-widget) carries
-   .markdown-rendered, so every class rule below already applies to it.
-   The one gap is the stock `thead tr > th` rule, which outranks
-   `.markdown-rendered th` and paints header borders with
-   --table-header-border-color — in BOTH views. Mapping the stock
-   variables to the theme's table tokens closes it everywhere. */
-body {
-    --table-border-color: var(--cc-table-border);
-    --table-header-border-color: var(--cc-table-border);
-    --table-add-button-border-color: var(--cc-table-border);
-}
-
+/* Live Preview: the LP table widget (.cm-embed-block.cm-table-widget)
+   carries .markdown-rendered (verified 1.12.7), so every class rule here
+   applies to it too; header border colors come from the --table-*
+   variables bound in section 2. No layout overrides — stability. */
 .markdown-rendered table {
     border-collapse: separate;
     border-spacing: 0;
@@ -1162,7 +1167,7 @@ body {
 }
 
 /* =====================================================================
-   9. CHROME  —  sidebar, tabs, titlebar, inputs, scrollbars
+   8. CHROME  —  tabs, explorer, inputs, menus, mobile, settings
    ===================================================================== */
 /* Tabs — idle tabs sit muted; the active tab gets a soft coral-tinted fill,
    set through Obsidian's own --tab-background-active variable (in the palette
@@ -1176,6 +1181,27 @@ body { --tab-text-color: var(--cc-text-muted); }
     --tab-text-color-focused-active: var(--cc-heading);
 }
 .workspace-tab-header.is-active .workspace-tab-header-inner-title { font-weight: 600; }
+/* Coral marks the FOCUSED pane's tab only. In every other pane the
+   active tab merges with its note instead, so with several panes open
+   the one that takes your keystrokes is obvious at a glance. */
+.workspace-tabs:not(.mod-active) { --tab-background-active: var(--cc-bg); }
+
+/* Every hover / active state change eases at the shared tempo instead of
+   snapping — explorer rows, tabs, icon buttons, properties, menu rows. */
+.tree-item-self, .workspace-tab-header, .workspace-tab-header-inner,
+.clickable-icon, .metadata-property, .suggestion-item, .menu-item,
+button:not(.copy-code-button) {
+    transition: background-color var(--cc-motion), color var(--cc-motion),
+        border-color var(--cc-motion);
+}
+
+/* Keyboard focus: one coral ring on every control (pointer clicks never
+   show it). Text fields keep their own focus border below. */
+:is(button, .clickable-icon, .tree-item-self, .workspace-tab-header,
+    .suggestion-item, .menu-item, .markdown-rendered a):focus-visible {
+    outline: 2px solid var(--cc-accent);
+    outline-offset: 2px;
+}
 
 /* File explorer hierarchy: bold folders, medium files (same font + size) */
 .workspace-leaf-content[data-type="file-explorer"] .nav-folder-title-content,
@@ -1280,7 +1306,7 @@ button.mod-cta { font-weight: 600; }
 /* Scrollbars stay quiet */
 ::-webkit-scrollbar-thumb { border-radius: 999px; }
 
-/* Status bar / breadcrumbs */
+/* Status bar */
 .status-bar { background-color: var(--cc-bg-alt); border-top: 1px solid var(--cc-border); }
 
 /* Embedded images & embeds — soft rounded corners */
@@ -1317,144 +1343,8 @@ button.mod-cta { font-weight: 600; }
 .modal.mod-settings .setting-item-description { font-size: calc(var(--font-ui-smaller) + 2px); }
 
 /* =====================================================================
-   10. PLUGIN INTEGRATIONS  —  Another Sticky Headings
-   ---------------------------------------------------------------------
-   Moves the plugin's heading trail out of the note body and into the
-   view header, rendered as a single-line clickable breadcrumb where the
-   note title normally sits. While scrolled into a section the title
-   fades out and the trail takes its place; back at the top of the note
-   the plain title returns. Toggle: Style Settings → Plugins.
-   Desktop only — on mobile (phone + tablet) the plugin's regular stacked
-   view is kept: the mobile header is too cramped for a breadcrumb.
-   Plugin DOM: .sticky-headings-root > .sticky-headings-container >
-   .sticky-headings-item[data-indent-level] (+ a .sticky-headings-shadow
-   copy used only for height measurement — left untouched).
+   9. SCROLL  —  progress bar + Claude Scroll Map companion
    ===================================================================== */
-
-/* Hide the note title while a heading trail is active (visibility too,
-   so the invisible title can't catch clicks meant for the breadcrumb).
-   Both the file-name title AND the parent-folder breadcrumb
-   (.view-header-title-parent, e.g. "Folder / Subfolder /") must go —
-   for a nested note the parent crumb is non-empty and would otherwise
-   collide with the trail. Asymmetric timing: hiding is immediate,
-   un-hiding waits 160ms — the plugin unmounts the trail for ~a frame
-   while re-rendering it, and without the delay every re-render flashes
-   the title over the trail. */
-body.cc-sticky-in-header:not(.is-mobile) .view-header-title,
-body.cc-sticky-in-header:not(.is-mobile) .view-header-title-parent {
-    transition: opacity 120ms ease 160ms, visibility 0s linear 160ms;
-}
-body.cc-sticky-in-header:not(.is-mobile)
-    .workspace-leaf:has(.sticky-headings-root:not(.sticky-headings-shadow)
-        .sticky-headings-item[data-indent-level])
-    .view-header-title,
-body.cc-sticky-in-header:not(.is-mobile)
-    .workspace-leaf:has(.sticky-headings-root:not(.sticky-headings-shadow)
-        .sticky-headings-item[data-indent-level])
-    .view-header-title-parent {
-    opacity: 0;
-    visibility: hidden;
-    transition: opacity 120ms ease, visibility 0s linear;
-}
-
-/* Let the repositioned trail escape the note area and overlay the header.
-   min-height: 0 is required: overflow:visible switches the flex item's
-   automatic minimum size to content-size, which would otherwise squeeze
-   the sibling .view-header. */
-body.cc-sticky-in-header:not(.is-mobile) .workspace-leaf-content[data-type="markdown"] .view-content {
-    overflow: visible;
-    min-height: 0;
-}
-
-/* The trail block: lift it up onto the view header row */
-body.cc-sticky-in-header:not(.is-mobile) .sticky-headings-root:not(.sticky-headings-shadow) {
-    top: calc(-1 * var(--header-height)) !important;
-    height: var(--header-height);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    /* clear the nav arrows (left) and view actions (right) */
-    padding: 0 110px !important;
-    background: none !important;
-    z-index: 5;
-    /* transparent gutters must not block header buttons underneath */
-    pointer-events: none;
-}
-
-/* Container: stacked tree → single centered row, no plugin theming */
-body.cc-sticky-in-header:not(.is-mobile) .sticky-headings-root:not(.sticky-headings-shadow)
-    .sticky-headings-container {
-    display: flex !important;
-    flex-flow: row nowrap;
-    align-items: center;
-    justify-content: center;
-    max-width: 100% !important;
-    min-width: 0;
-    margin: 0 !important;
-    padding: 0 !important;
-    background: none !important;
-    backdrop-filter: none !important;
-    border-radius: 0 !important;
-    color: var(--text-normal) !important;
-    font-size: var(--font-ui-small) !important;
-    overflow: hidden;
-}
-/* the blur theme paints gradients via pseudo-elements — remove them */
-body.cc-sticky-in-header:not(.is-mobile) .sticky-headings-root:not(.sticky-headings-shadow)
-    .sticky-headings-container::before,
-body.cc-sticky-in-header:not(.is-mobile) .sticky-headings-root:not(.sticky-headings-shadow)
-    .sticky-headings-container::after {
-    display: none !important;
-}
-
-/* Items: uniform title-style text, no indent, clickable, ellipsized */
-body.cc-sticky-in-header:not(.is-mobile) .sticky-headings-root:not(.sticky-headings-shadow)
-    .sticky-headings-item {
-    padding-left: 0 !important;
-    flex: 0 1 auto;
-    min-width: 0;
-    line-height: var(--header-height);
-    font-weight: var(--font-medium, 500);
-    color: var(--text-normal);
-    pointer-events: auto;
-}
-body.cc-sticky-in-header:not(.is-mobile) .sticky-headings-root:not(.sticky-headings-shadow)
-    .sticky-headings-item:hover {
-    color: var(--text-accent);
-}
-
-/* Page-name crumb — the plugin's file-name item (autoShowFileName) is the
-   only item without a data-indent-level. Coral + semibold so the trail
-   reads "where am I" at a glance: Page › section › subsection. */
-body.cc-sticky-in-header:not(.is-mobile) .sticky-headings-root:not(.sticky-headings-shadow)
-    .sticky-headings-item:not([data-indent-level]) {
-    color: var(--text-accent);
-    font-weight: var(--font-semibold, 600);
-}
-/* ...but never alone: with no heading crumbs next to it the native note
-   title stays visible instead (also masks the plugin's stale-file-name
-   bug when switching notes within a tab). */
-body.cc-sticky-in-header:not(.is-mobile) .sticky-headings-root:not(.sticky-headings-shadow)
-    .sticky-headings-item:not([data-indent-level]):only-child {
-    display: none !important;
-}
-
-/* › separators between crumbs */
-body.cc-sticky-in-header:not(.is-mobile) .sticky-headings-root:not(.sticky-headings-shadow)
-    .sticky-headings-item + .sticky-headings-item::before {
-    content: "›";
-    flex: none;
-    margin: 0 0.5em;
-    color: var(--text-faint);
-    font-weight: 400;
-}
-
-/* Uniform text: drop the per-level H badges */
-body.cc-sticky-in-header:not(.is-mobile) .sticky-headings-root:not(.sticky-headings-shadow)
-    .sticky-headings-icon {
-    display: none !important;
-}
-
 /* ---------------------------------------------------------------------
    Scroll progress bar  (Style Settings → Editor → Scroll progress bar)
    ---------------------------------------------------------------------
@@ -1480,8 +1370,10 @@ body.cc-scroll-progress .workspace-leaf-content[data-type="markdown"]
 }
 body.cc-scroll-progress .workspace-leaf-content[data-type="markdown"] .view-content {
     position: relative;
-    /* let centered markers straddle the line without clipping;
-       min-height keeps flex from squeezing the header (see breadcrumb) */
+    /* let centered markers straddle the line without clipping.
+       min-height: 0 is required with overflow:visible — it flips the
+       flex item's automatic minimum to content-size, which would
+       otherwise squeeze the sibling .view-header. */
     overflow: visible;
     min-height: 0;
 }
@@ -1501,7 +1393,7 @@ body.cc-scroll-progress .workspace-leaf-content[data-type="markdown"] .view-cont
         linear-gradient(to bottom, var(--cc-bg) 60%, transparent);
     z-index: 8;
     pointer-events: none;
-    transition: height 130ms ease;
+    transition: height var(--cc-motion);
 }
 /* Fill */
 body.cc-scroll-progress .workspace-leaf-content[data-type="markdown"] .view-content::after {
@@ -1517,7 +1409,7 @@ body.cc-scroll-progress .workspace-leaf-content[data-type="markdown"] .view-cont
     pointer-events: none;
     animation: cc-scroll-progress-fill linear both;
     animation-timeline: --cc-note-scroll;
-    transition: height 130ms ease, top 130ms ease;
+    transition: height var(--cc-motion), top var(--cc-motion);
 }
 /* Hovering the scroll-map strip thickens the line, still centered.
    The .cc-map-hover class is toggled by the companion plugin on strip
@@ -1575,8 +1467,12 @@ body .cc-scroll-map {
     top: 0; left: 0; right: 0;
     height: 12px;                    /* hover zone for the strip */
     z-index: 10;
-    transition: height 130ms ease;
+    transition: height var(--cc-motion);
+    /* the plugin builds the strip a beat after the note opens — ease
+       it in rather than popping it onto a page that is already there */
+    animation: cc-fade-in 240ms ease both;
 }
+@keyframes cc-fade-in { from { opacity: 0; } }
 /* With the progress bar on, the theme's track pseudo paints the backdrop
    band — a bg on the map would sit above the bar and hide it. With the
    bar toggled off, the plugin's own gradient band stays so markers never
@@ -1632,7 +1528,7 @@ body .cc-scroll-map .cc-scroll-dot {
     background: var(--cc-bg);
     box-shadow: 0 0 0 2px var(--cc-bg);  /* halo ring widens the gap */
     cursor: pointer;
-    transition: height 130ms ease, width 130ms ease,
+    transition: height var(--cc-motion), width var(--cc-motion),
         transform 60ms ease-out;
 }
 /* The fade is OPACITY, not a color-mix: Chromium's scroll-driven color
@@ -1713,7 +1609,7 @@ body .cc-scroll-map .cc-scroll-dot::after {
 body .cc-scroll-map .cc-scroll-dot:hover::after, body .cc-scroll-map .cc-scroll-dot.cc-hovered::after { display: block; }
 
 /* =====================================================================
-   11. REDUCED MOTION  —  honour the OS "reduce motion" setting
+   10. REDUCED MOTION  —  honour the OS "reduce motion" setting
    ---------------------------------------------------------------------
    When the user has asked their system to minimise motion, collapse all
    transitions/animations to near-instant. Duration stays > 0 so any

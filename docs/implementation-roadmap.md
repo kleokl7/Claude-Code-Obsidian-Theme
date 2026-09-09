@@ -9,6 +9,13 @@ Orange, light-mode tuning dials, accent-aware forwarded-task chevron, table
 color parity via Obsidian's `--table-*` variables, companion install script,
 `versions.json` + release-script guard, fonts/trademark/scroll-support docs.
 
+Shipped in the September 2026 pass (1.5.0): sticky-headings breadcrumb
+integration removed entirely (plugin no longer in use; its header-gutter
+item is gone from this roadmap), palette blocks consolidated into one shared
+mapping, metric-matched font fallbacks, shared motion token, focus rings,
+unresolved-link and focused-pane cues, reading-view task states fixed for
+the Tasks plugin DOM, TOC comment at the top of `theme.css`.
+
 ---
 
 ## 1. Coverage gaps — styling recipes
@@ -94,45 +101,25 @@ app chrome. Publish sites use different CSS entry points — separate effort.
 
 ---
 
-## 2. Sticky-headings header gutters
+## 2. CSS maintainability
 
-The breadcrumb overlay clears the nav arrows / view actions with a magic
-number (`padding: 0 110px !important` on `.sticky-headings-root`). Breaks
-under icon packs, UI font scaling, RTL, narrow panes, or a header redesign.
+`theme.css` is ~1650 lines, with a TOC comment at the top matching the
+section banners (done 2026-09). In order of value:
 
-- **Option A — CSS-only heuristic** (interim): `padding-left: max(96px, 12vw);
-  padding-right: max(120px, 14vw);` — test at 900/1200/1600 px pane widths.
-- **Option B — measure (recommended)**: on layout-change/resize, measure the
-  `.view-header-left` / actions cluster widths from the companion plugin and
-  set `--cc-header-pad-left/right` on the leaf; theme consumes
-  `var(--cc-header-pad-left, 110px)`. Fallback keeps today's behavior.
-- **Option C — abandon title-bar overlay**: style the plugin's default sticky
-  stack. Most stable, loses the breadcrumb-in-title design.
-
-Verify: narrow + wide panes, plugin settings that add icons, RTL if
-available, mobile untouched (rules already gated `:not(.is-mobile)`).
-
----
-
-## 3. CSS maintainability
-
-`theme.css` is ~1700 lines and still navigable via section banners. In order
-of value:
-
-1. **TOC comment at file top** matching the section banners — zero risk.
-2. **Strict section discipline** — plugin hacks never land inside token
-   blocks; new plugin work goes in section 10+.
-3. **Multi-file `src/` + concat build** — only when a second maintainer
+1. **Strict section discipline** — plugin hacks never land inside token
+   blocks; new plugin work goes in section 9+.
+2. **Multi-file `src/` + concat build** — only when a second maintainer
    exists or the file passes ~2.5–3k lines. Obsidian still ships one
    `theme.css`; `build.sh` concatenates.
-4. **Reduce `!important` on links** only if a real conflict appears.
-5. **Keep documenting selector contracts** for fragile integrations (sticky
-   headings DOM, scroll-map classes, `--table-*` mapping pinned to the
-   Obsidian version it was inspected against).
+3. **Reduce `!important` on links** only if a real conflict appears (19
+   left after the 2026-09 pass, down from 35).
+4. **Keep documenting selector contracts** for fragile integrations
+   (scroll-map classes, Tasks-plugin task DOM, `--table-*` mapping pinned
+   to the Obsidian version it was inspected against).
 
 ---
 
-## 4. Community listing quality
+## 3. Community listing quality
 
 Present: `manifest.json`, `theme.css`, `versions.json` (+ release guard),
 `release.sh`, README screenshots, MIT license.

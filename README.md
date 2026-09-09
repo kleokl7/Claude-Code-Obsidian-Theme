@@ -28,18 +28,17 @@ Beyond the standard empty and done checkboxes, the theme styles three extra task
 | `- [x]` | filled coral box with a white tick | done — text struck through |
 | `- [-]` | muted box with a dash | cancelled — text struck through and faded |
 
-Works in both reading view and Live Preview, on desktop and mobile.
+Works in both reading view and Live Preview, on desktop and mobile — including reading view with the [Tasks](https://github.com/obsidian-tasks-group/obsidian-tasks) plugin installed, which re-renders task items in its own markup.
 
-## Navigation — breadcrumb, progress bar & scroll map
+## Navigation — progress bar & scroll map
 
-Three layers that answer *where am I* and *how far along am I* in long notes:
+Two layers that answer *how far along am I* in long notes:
 
 <p align="center">
   <img width="100%" src="screenshots/scroll-map-dark.png" />
   <img width="100%" src="screenshots/scroll-map-light.png" />
 </p>
 
-- **Heading breadcrumb in the title bar** — with the community plugin [Another Sticky Headings](https://github.com/zhouhua/obsidian-sticky-headings) installed, scrolling into a section replaces the note title with a clickable trail: the page name in coral, then the headings above your position (`Page › Section › Subsection`). Scroll back to the top and the plain title returns. Desktop only — on mobile the plugin keeps its regular stacked view. Toggle under *Style Settings → Plugins*.
 - **Scroll progress bar** — a thin coral fill at the seam under the title row tracks your position as you read. Pure CSS (scroll-driven animation), spans the editor and resizes with the sidebars. On mobile it pins to the bottom of the editor area instead. Toggle under *Style Settings → Editor*.
 
   *Engine support:* the fill uses [CSS scroll-driven animations](https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_scroll-driven_animations), which desktop Obsidian (Chromium) and Obsidian on Android support. On an engine without them (notably some iOS builds) the bar simply stays empty — nothing breaks, and the companion plugin's heading dots still work as click targets. The fill is scroll-linked, not autonomous motion, so it intentionally keeps tracking your position when the OS *Reduce motion* setting is on.
@@ -51,7 +50,16 @@ Three layers that answer *where am I* and *how far along am I* in long notes:
   ```
   from a checkout of this repo — or copy the three files in [`companion/claude-scroll-map`](companion/claude-scroll-map) into `<vault>/.obsidian/plugins/claude-scroll-map/` by hand. Then enable **Claude Scroll Map** in *Settings → Community plugins* (re-run the script and reload Obsidian to update it later).
 
-Each layer works without the others: theme alone gives you the progress bar; add either plugin for its part.
+The theme alone gives you the progress bar; the plugin adds the dots.
+
+## At a glance
+
+Small cues that tell you what is what without reading for it:
+
+- **Links that lead nowhere look different.** A `[[link]]` to a note that doesn't exist yet is the same coral, but faded with a dotted underline — in reading view and Live Preview.
+- **Only the focused pane gets the coral tab.** With several panes open, the active tab of the pane that takes your keystrokes is coral-tinted; other panes' active tabs merge with their note instead.
+- **Task states** read as shapes, not characters (see above).
+- **One tempo for every state change.** Hover and focus on files, tabs, buttons and properties ease in over 120 ms instead of snapping; the scroll-map strip fades in when a note opens. Keyboard focus shows one coral ring everywhere.
 
 ## Fonts
 
@@ -66,6 +74,8 @@ Claude's real typefaces (**Styrene B**, **Tiempos Text**, **Galaxie Copernicus**
 If you own the real fonts and install them on your system, they sit at the front of every font stack and will be used automatically — no config needed.
 
 The lookalikes load from Google Fonts over the web. This is an intentional tradeoff: the theme stays a single lightweight CSS file with no bundled font payload. The `@import` needs an internet connection on first load (Obsidian usually caches the files afterwards); offline, or with Google's CDN blocked, the theme still works and text falls back to the system fonts in each stack.
+
+Until the web fonts arrive, text is set in a *metric-matched* local fallback (Arial / Roboto scaled to Hanken Grotesk's glyph widths, Georgia scaled to Source Serif 4's), so the swap doesn't reflow the page — no jump on first launch or on a slow connection.
 
 ## Install
 
@@ -98,7 +108,6 @@ Install the community plugin **[Style Settings](https://github.com/mgmeyers/obsi
 - **Loud code blocks** — on (default) gives code blocks a blue frame so they stand out; off keeps them warm, in line with the coral theme.
 - **Highlight active line** — a very light tint behind the editor row your cursor is on (on by default).
 - **Scroll progress bar** — the coral reading-position bar (on by default).
-- **Sticky headings in the title bar** — the breadcrumb integration described above (on by default; inert without the plugin).
 
 All defaults match the Claude Code look, so the theme looks right with the plugin not installed too.
 

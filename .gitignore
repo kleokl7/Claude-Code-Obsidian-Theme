@@ -1,2 +1,7 @@
 # ShipStudio metadata
 .shipstudio/
+
+# Local dev: your vault paths for scripts/dev-deploy.sh, and the test
+# vault that scripts/live-check.sh builds
+.dev-vaults
+test-vault/

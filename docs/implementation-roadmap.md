@@ -16,6 +16,13 @@ mapping, metric-matched font fallbacks, shared motion token, focus rings,
 unresolved-link and focused-pane cues, reading-view task states fixed for
 the Tasks plugin DOM, TOC comment at the top of `theme.css`.
 
+Shipped in 1.5.1 (2026-09-23): mobile bar uses the light-mode track color;
+without Style Settings every option keeps its documented default (progress
+bar, active-line tint and loud code blocks were silently off); tooling —
+`scripts/check.sh`, `scripts/dev-deploy.sh`,
+`scripts/live-check.sh` + `tests/fixtures`, `scripts/readme-shots.sh`,
+`tests/release.test.sh`, and a self-verifying `release.sh`. See CLAUDE.md.
+
 ---
 
 ## 1. Coverage gaps — styling recipes
@@ -52,16 +59,19 @@ the command palette cards.
 Toolbar/background `--cc-bg-alt`; warm (not cold black) page shadow; coral
 find-highlight. **Never recolor the PDF page content itself.**
 
-### Hover popovers / tooltips / suggestion menus
+### Hover popovers
 
 `--cc-bg-alt` surface, `--cc-border`, `--cc-radius`, warm soft shadow. The
 preview markdown inside inherits note styling once the surface is themed.
+(Already done: tooltips get the warm `--cc-tooltip-bg` surface in 1.5.0;
+suggestion menus and the command palette are soft cards in section 8.)
 
-### Notices / toasts / modals
+### Notices / toasts
 
-Modal surface `--cc-bg`/`--cc-bg-alt` + `--cc-radius` + `--cc-border`; CTAs
-already covered by `button.mod-cta`; notices optionally get a coral left
-border.
+Notices optionally get a coral left border. (Already done in 1.5.0: notices
+share the warm tooltip surface; modals and menus take the theme radius and
+border through `--modal-*` / `--menu-*`; CTAs are covered by
+`button.mod-cta`.)
 
 ### Math (KaTeX / MathJax)
 
@@ -129,7 +139,7 @@ Remaining when distribution becomes a priority:
 | Item | Action |
 | --- | --- |
 | Chrome screenshots | add `screenshots/chrome-light.png` / `chrome-dark.png` showing sidebar + tabs, not just the note body |
-| `theme-preview.png` | regenerate after any visual change; it's the storefront |
+| `theme-preview.png` | regenerate after any visual change with `./scripts/readme-shots.sh` (also refreshes the README shots); it's the storefront |
 | Release notes | always pass real `--notes` to `release.sh` |
 | Issue template | OS, Obsidian version, light/dark, Style Settings on/off, plugins |
 | README badges | latest release + min app version (optional) |

@@ -1,6 +1,6 @@
 /* Claude Scroll Map — structural baseline only.
-   The Claude Code Orange theme restyles all of this (colors, sizes, hollow
-   fill-in, tooltip) with `body`-prefixed selectors that deliberately
+   The Claude Code Orange theme restyles all of this (colors, sizes, shapes,
+   fade-to-fill, tooltip) with `body`-prefixed selectors that deliberately
    out-rank these; the rules here just keep the plugin usable with any
    theme. */
 

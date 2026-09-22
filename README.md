@@ -42,7 +42,7 @@ Two layers that answer *how far along am I* in long notes:
 - **Scroll progress bar** — a thin coral fill at the seam under the title row tracks your position as you read. Pure CSS (scroll-driven animation), spans the editor and resizes with the sidebars. On mobile it pins to the bottom of the editor area instead. Toggle under *Style Settings → Editor*.
 
   *Engine support:* the fill uses [CSS scroll-driven animations](https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_scroll-driven_animations), which desktop Obsidian (Chromium) and Obsidian on Android support. On an engine without them (notably some iOS builds) the bar simply stays empty — nothing breaks, and the companion plugin's heading dots still work as click targets. The fill is scroll-linked, not autonomous motion, so it intentionally keeps tracking your position when the OS *Reduce motion* setting is on.
-- **Heading dots (Claude Scroll Map)** — a tiny companion plugin in [`companion/claude-scroll-map`](companion/claude-scroll-map) drops a marker on the bar for every heading: a Claude starburst for each H1, coral circles for H2/H3 (larger circle = higher level). Each marker starts faded and fills coral the moment its heading reaches the top of the view, in step with the progress fill — so the run of solid markers shows exactly how far you've read, never lighting a section before you get to it. Hover a dot for the heading name, hover anywhere on the bar for the section you'd land in, click to jump. Overlapping dots merge automatically. Desktop only — mobile stays progress-bar-only.
+- **Heading dots (Claude Scroll Map)** — a tiny companion plugin in [`companion/claude-scroll-map`](companion/claude-scroll-map) drops a marker on the bar for every heading: a Claude starburst for each H1, coral circles for H2/H3 (larger circle = higher level). Each marker starts faded and fills coral the moment its heading reaches the top of the view, in step with the progress fill — so the run of solid markers shows exactly how far you've read, never lighting a section before you get to it. Hover a dot for the heading name, hover anywhere on the bar for the section you'd land in, click to jump. Overlapping dots merge automatically. On mobile the markers ride the bottom progress bar, cut in half at the screen edge, and are purely visual: no hover, no tap-to-jump.
 
   **Install the companion** (not in the community store yet):
   ```bash
@@ -109,7 +109,7 @@ Install the community plugin **[Style Settings](https://github.com/mgmeyers/obsi
 - **Highlight active line** — a very light tint behind the editor row your cursor is on (on by default).
 - **Scroll progress bar** — the coral reading-position bar (on by default).
 
-All defaults match the Claude Code look, so the theme looks right with the plugin not installed too.
+All defaults match the Claude Code look, and without the plugin every option keeps the default listed above — progress bar and active-line tint on, loud code blocks on. (The preview images show code blocks with **Loud code blocks** turned off.)
 
 ## Preview
 
@@ -127,9 +127,12 @@ The Obsidian directory reads GitHub **Releases**, not the repo — it needs a re
 ```bash
 ./release.sh                       # tags + pushes + creates the release
 ./release.sh --notes "What's new"  # with custom release notes
+./release.sh --verify 1.5.0        # read-only: does a release have all its files?
 ```
 
-The script reads the version from `manifest.json`, refuses to run on a dirty tree, an existing tag, or a `versions.json` that doesn't know the version, and attaches `theme.css`, `manifest.json` and `versions.json` to the release. Prefer real `--notes` listing user-visible changes over the default line.
+The script reads the version from `manifest.json` and first runs `scripts/check.sh` (JSON, the `versions.json` entry, `theme.css` structure, plugin syntax). It refuses to run on a dirty tree or a tag that already exists on another commit, attaches `theme.css`, `manifest.json` and `versions.json`, then verifies they are really attached and re-uploads any that are missing. If a run stops part-way, just run it again: a tag already on `HEAD` resumes instead of refusing. Prefer real `--notes` listing user-visible changes over the default line.
+
+`./tests/release.test.sh` exercises all of this against a fake `gh` and a local bare remote — run it after changing `release.sh`.
 
 ## License & affiliation
 

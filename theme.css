@@ -56,6 +56,12 @@
 
 /* ---------------------------------------------------------------------
    STYLE SETTINGS  (https://github.com/mgmeyers/obsidian-style-settings)
+   ---------------------------------------------------------------------
+   Class toggles reach <body> only while Style Settings runs. The three
+   that default to ON — cc-active-line, cc-loud-code, cc-scroll-progress —
+   are written as `body:is(.cc-x, :not(.css-settings-manager))`: on when
+   toggled on, or when Style Settings (which adds .css-settings-manager
+   as it loads) is not installed at all. Same specificity as body.cc-x.
    --------------------------------------------------------------------- */
 /* @settings
 
@@ -580,8 +586,8 @@ body {
 
 /* Active line — a very light tint behind the row the cursor is on.
    Toggle: Style Settings → Claude Code Orange → Editor → Highlight active line. */
-body.cc-active-line .markdown-source-view.mod-cm6 .cm-active.cm-line,
-body.cc-active-line .markdown-source-view.mod-cm6 .cm-active.cm-gutterElement {
+body:is(.cc-active-line, :not(.css-settings-manager)) .markdown-source-view.mod-cm6 .cm-active.cm-line,
+body:is(.cc-active-line, :not(.css-settings-manager)) .markdown-source-view.mod-cm6 .cm-active.cm-gutterElement {
     background-color: var(--cc-active-line-bg);
     border-radius: var(--radius-s);
 }
@@ -726,12 +732,12 @@ body.claude-mono-headings :is(.markdown-rendered h1, .markdown-rendered h2,
 
 /* "Loud code blocks" (Style Settings, on by default): blue frame + text so
    code stands out. Off → the warm defaults above, in line with the theme. */
-body.cc-loud-code.theme-light {
+body:is(.cc-loud-code, :not(.css-settings-manager)).theme-light {
     --cc-code-bg:     #eaf1fd;              /* light blue */
     --cc-code-border: #cadcf3;
     --cc-code-text:   #11589f;              /* deep azure */
 }
-body.cc-loud-code.theme-dark {
+body:is(.cc-loud-code, :not(.css-settings-manager)).theme-dark {
     --cc-code-bg:     #182234;              /* deep blue */
     --cc-code-border: #2b3c59;
     --cc-code-text:   #7db7ff;              /* sky blue */
@@ -1357,18 +1363,18 @@ button.mod-cta { font-weight: 600; }
    The Claude Scroll Map companion plugin drops heading dots onto the
    same strip (.cc-scroll-map, styled further below).
    --------------------------------------------------------------------- */
-body.cc-scroll-progress .workspace-leaf-content[data-type="markdown"] {
+body:is(.cc-scroll-progress, :not(.css-settings-manager)) .workspace-leaf-content[data-type="markdown"] {
     timeline-scope: --cc-note-scroll;
 }
 /* Only the visible mode's scroller has a box, so exactly one element
    provides the timeline at any moment (duplicates would void the name) */
-body.cc-scroll-progress .workspace-leaf-content[data-type="markdown"]
+body:is(.cc-scroll-progress, :not(.css-settings-manager)) .workspace-leaf-content[data-type="markdown"]
     .markdown-source-view.mod-cm6 .cm-scroller,
-body.cc-scroll-progress .workspace-leaf-content[data-type="markdown"]
+body:is(.cc-scroll-progress, :not(.css-settings-manager)) .workspace-leaf-content[data-type="markdown"]
     .markdown-preview-view {
     scroll-timeline: --cc-note-scroll block;
 }
-body.cc-scroll-progress .workspace-leaf-content[data-type="markdown"] .view-content {
+body:is(.cc-scroll-progress, :not(.css-settings-manager)) .workspace-leaf-content[data-type="markdown"] .view-content {
     position: relative;
     /* let centered markers straddle the line without clipping.
        min-height: 0 is required with overflow:visible — it flips the
@@ -1382,7 +1388,7 @@ body.cc-scroll-progress .workspace-leaf-content[data-type="markdown"] .view-cont
 /* Track — doubles as the instrument's backdrop: a band of note
    background fading downward masks any scrolled text passing under the
    markers, with the 3px track line painted on top of it. */
-body.cc-scroll-progress .workspace-leaf-content[data-type="markdown"] .view-content::before {
+body:is(.cc-scroll-progress, :not(.css-settings-manager)) .workspace-leaf-content[data-type="markdown"] .view-content::before {
     content: "";
     position: absolute;
     top: 0; left: 0;
@@ -1396,7 +1402,7 @@ body.cc-scroll-progress .workspace-leaf-content[data-type="markdown"] .view-cont
     transition: height var(--cc-motion);
 }
 /* Fill */
-body.cc-scroll-progress .workspace-leaf-content[data-type="markdown"] .view-content::after {
+body:is(.cc-scroll-progress, :not(.css-settings-manager)) .workspace-leaf-content[data-type="markdown"] .view-content::after {
     content: "";
     position: absolute;
     top: 4px; left: 0;
@@ -1415,7 +1421,7 @@ body.cc-scroll-progress .workspace-leaf-content[data-type="markdown"] .view-cont
    The .cc-map-hover class is toggled by the companion plugin on strip
    enter/leave — cheaper than :has(:hover), which re-evaluates on every
    pointer move. */
-body.cc-scroll-progress .workspace-leaf-content[data-type="markdown"]
+body:is(.cc-scroll-progress, :not(.css-settings-manager)) .workspace-leaf-content[data-type="markdown"]
     .view-content.cc-map-hover::before {
     height: 27px;
     background:
@@ -1423,7 +1429,7 @@ body.cc-scroll-progress .workspace-leaf-content[data-type="markdown"]
             0 3px / 100% 5px no-repeat,
         linear-gradient(to bottom, var(--cc-bg) 60%, transparent);
 }
-body.cc-scroll-progress .workspace-leaf-content[data-type="markdown"]
+body:is(.cc-scroll-progress, :not(.css-settings-manager)) .workspace-leaf-content[data-type="markdown"]
     .view-content.cc-map-hover::after {
     top: 3px;
     height: 5px;
@@ -1442,19 +1448,19 @@ body.cc-scroll-progress .workspace-leaf-content[data-type="markdown"]
     95%  { transform: scaleX(calc(var(--cc-fill-max, 1) * 0.95)); }
     to   { transform: scaleX(1); }
 }
-/* Mobile: bottom of the visible editor area, a touch thicker; no dots
-   means no backdrop band — plain track line */
-body.cc-scroll-progress.is-mobile .workspace-leaf-content[data-type="markdown"] .view-content::before,
-body.cc-scroll-progress.is-mobile .workspace-leaf-content[data-type="markdown"] .view-content::after {
+/* Mobile: bottom of the visible editor area, a touch thicker. The
+   companion's half-cut markers ride this bar too (see below). */
+body:is(.cc-scroll-progress, :not(.css-settings-manager)).is-mobile .workspace-leaf-content[data-type="markdown"] .view-content::before,
+body:is(.cc-scroll-progress, :not(.css-settings-manager)).is-mobile .workspace-leaf-content[data-type="markdown"] .view-content::after {
     top: auto; bottom: 0;
     height: 4px;
 }
-body.cc-scroll-progress.is-mobile .workspace-leaf-content[data-type="markdown"] .view-content::before {
+body:is(.cc-scroll-progress, :not(.css-settings-manager)).is-mobile .workspace-leaf-content[data-type="markdown"] .view-content::before {
     /* like desktop's band: bg fading upward masks text passing under the
        markers, with the 4px track painted at the bottom of it */
     height: 18px;
     background:
-        linear-gradient(var(--cc-border), var(--cc-border))
+        linear-gradient(var(--cc-track-color), var(--cc-track-color))
             0 100% / 100% 4px no-repeat,
         linear-gradient(to top, var(--cc-bg) 40%, transparent);
 }
@@ -1477,7 +1483,7 @@ body .cc-scroll-map {
    band — a bg on the map would sit above the bar and hide it. With the
    bar toggled off, the plugin's own gradient band stays so markers never
    float naked over note text. */
-body.cc-scroll-progress .cc-scroll-map { background: none; }
+body:is(.cc-scroll-progress, :not(.css-settings-manager)) .cc-scroll-map { background: none; }
 body .cc-scroll-map:hover { height: 24px; }   /* roomier target while aiming */
 /* Mobile: markers ride the theme's BOTTOM progress bar, cut at their
    middle — the map bottom-docks over the bar and overflow-hidden slices
@@ -1485,7 +1491,7 @@ body .cc-scroll-map:hover { height: 24px; }   /* roomier target while aiming */
    hover (pointer-events off). Without the progress bar toggle there is
    no bar to ride, so the map stays hidden. */
 body.is-mobile .cc-scroll-map { display: none; }
-body.cc-scroll-progress.is-mobile .cc-scroll-map {
+body:is(.cc-scroll-progress, :not(.css-settings-manager)).is-mobile .cc-scroll-map {
     display: block;
     top: auto;
     bottom: 0;
@@ -1494,15 +1500,15 @@ body.cc-scroll-progress.is-mobile .cc-scroll-map {
     background: none;
     pointer-events: none;
 }
-body.cc-scroll-progress.is-mobile .cc-scroll-map .cc-scroll-dot {
+body:is(.cc-scroll-progress, :not(.css-settings-manager)).is-mobile .cc-scroll-map .cc-scroll-dot {
     top: 100%;                        /* equator on the clip edge: true half */
     pointer-events: none;
     cursor: default;
 }
 /* mobile sizes: a touch bigger than desktop — only the top half shows */
-body.cc-scroll-progress.is-mobile .cc-scroll-map .cc-scroll-dot                  { width: 9px;  height: 9px; }
-body.cc-scroll-progress.is-mobile .cc-scroll-map .cc-scroll-dot[data-level="1"]  { width: 20px; height: 20px; }
-body.cc-scroll-progress.is-mobile .cc-scroll-map .cc-scroll-dot[data-level="3"]  { width: 7px;  height: 7px; }
+body:is(.cc-scroll-progress, :not(.css-settings-manager)).is-mobile .cc-scroll-map .cc-scroll-dot                  { width: 9px;  height: 9px; }
+body:is(.cc-scroll-progress, :not(.css-settings-manager)).is-mobile .cc-scroll-map .cc-scroll-dot[data-level="1"]  { width: 20px; height: 20px; }
+body:is(.cc-scroll-progress, :not(.css-settings-manager)).is-mobile .cc-scroll-map .cc-scroll-dot[data-level="3"]  { width: 7px;  height: 7px; }
 /* Headings as brand marks: the Claude starburst for H1 landmarks,
    soft coral circles for H2/H3. Every marker is full coral once read;
    unread markers are the same coral mixed toward the note background —
@@ -1625,8 +1631,7 @@ body .cc-scroll-map .cc-scroll-dot:hover::after, body .cc-scroll-map .cc-scroll-
     /* The scroll progress fill and the marker fill-in are scroll-linked,
        not autonomous motion — a forced time duration would pin them at
        100%. Restore the timeline mapping. */
-    body.cc-scroll-progress .workspace-leaf-content[data-type="markdown"] .view-content::after,
-    body .cc-scroll-map .cc-scroll-dot,
+    body:is(.cc-scroll-progress, :not(.css-settings-manager)) .workspace-leaf-content[data-type="markdown"] .view-content::after,
     body .cc-scroll-map .cc-scroll-dot::before {
         animation-duration: auto !important;
     }

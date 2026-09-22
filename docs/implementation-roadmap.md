@@ -23,7 +23,7 @@ bar, active-line tint and loud code blocks were silently off); tooling —
 `scripts/live-check.sh` + `tests/fixtures`, `scripts/readme-shots.sh`,
 `tests/release.test.sh`, and a self-verifying `release.sh`. See CLAUDE.md.
 
-Shipped in Claude Scroll Map 0.3.4 (2026-09-23): the editor's text no
+Shipped in 1.5.2 (2026-09-23), Claude Scroll Map 0.3.4: the editor's text no
 longer drifts and snaps back while a sidebar opens or closes. CodeMirror
 debounces its resize measure by 50 ms; the plugin measures in a
 ResizeObserver instead (same frame, before paint). Reading view is not

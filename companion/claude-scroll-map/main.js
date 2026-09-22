@@ -15,6 +15,8 @@
  * - Mobile: markers render too (the theme docks them on its bottom
  *   progress bar, cut at the middle) but are VISUAL ONLY — no hover,
  *   no fisheye, no tap-to-jump; the theme also sets pointer-events:none
+ * - Keeps the editor's text still while a sidebar opens or closes (see
+ *   watchWidth)
  */
 
 const { Plugin, MarkdownView, Platform, debounce } = require('obsidian');
@@ -37,6 +39,12 @@ module.exports = class ClaudeScrollMap extends Plugin {
     this.geoObserver = new ResizeObserver(() => this.refresh());
     this.register(() => this.geoObserver.disconnect());
     this.observed = new WeakSet();
+    // Editor scrollers watched for width changes → { cm, width }
+    this.widths = new WeakMap();
+    this.widthObserver = new ResizeObserver((entries) => {
+      for (const { target } of entries) this.onEditorResize(target);
+    });
+    this.register(() => this.widthObserver.disconnect());
     this.registerEvent(this.app.workspace.on('layout-change', this.refresh));
     this.registerEvent(this.app.workspace.on('active-leaf-change', this.refresh));
     this.registerEvent(this.app.workspace.on('file-open', this.refresh));
@@ -51,8 +59,45 @@ module.exports = class ClaudeScrollMap extends Plugin {
 
   updateAll() {
     this.app.workspace.iterateAllLeaves((leaf) => {
-      if (leaf.view instanceof MarkdownView) this.updateView(leaf.view);
+      if (!(leaf.view instanceof MarkdownView)) return;
+      this.watchWidth(leaf.view);
+      this.updateView(leaf.view);
     });
+  }
+
+  // Opening or closing a sidebar re-wraps every line of the note, which
+  // changes the height of the text above the viewport. CodeMirror corrects
+  // the scroll position for that only after a 50 ms resize debounce, so
+  // while the sidebar slides the visible text drifts by several lines and
+  // then snaps back (a line from above flashes in under the progress bar).
+  // A ResizeObserver callback runs after layout and before paint, so
+  // measuring there applies CodeMirror's own scroll-anchor correction in
+  // the same frame as the width change: the text stays still.
+  watchWidth(view) {
+    const cm = view.editor && view.editor.cm;
+    if (!cm || this.widths.has(cm.scrollDOM)) return;
+    this.widths.set(cm.scrollDOM, { cm, width: cm.scrollDOM.clientWidth });
+    this.widthObserver.observe(cm.scrollDOM);
+  }
+
+  onEditorResize(el) {
+    const entry = this.widths.get(el);
+    if (!entry) return;
+    if (!el.isConnected) {
+      // leaf closed; a later updateAll re-adds a scroller that comes back
+      this.widthObserver.unobserve(el);
+      this.widths.delete(el);
+      return;
+    }
+    const width = el.clientWidth;
+    if (width === entry.width) return;   // height-only change: no re-wrap
+    entry.width = width;
+    if (!width) return;                  // hidden (reading mode)
+    // measure() is CodeMirror-internal (what its own debounced resize
+    // handler ends up calling); the public requestMeasure() is the
+    // fallback — one frame late, but still without the debounce.
+    if (typeof entry.cm.measure === 'function') entry.cm.measure();
+    else entry.cm.requestMeasure();
   }
 
   updateView(view) {

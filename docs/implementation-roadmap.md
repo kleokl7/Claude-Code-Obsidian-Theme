@@ -29,6 +29,12 @@ debounces its resize measure by 50 ms; the plugin measures in a
 ResizeObserver instead (same frame, before paint). Reading view is not
 covered: Obsidian does not re-anchor it on a width change at all.
 
+Unreleased (2026-09-25), Claude Scroll Map 0.3.5: with the progress bar
+toggled off, the heading markers rode up onto the view header. The theme
+made the note box (`.view-content`) the positioning anchor only while the
+bar was on; it now does so either way, and the plugin's baseline CSS does
+too, for other themes. `live-check.sh` checks it (`no-bar-map`).
+
 ---
 
 ## 1. Coverage gaps — styling recipes

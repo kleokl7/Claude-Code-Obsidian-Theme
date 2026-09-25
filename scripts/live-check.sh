@@ -80,6 +80,14 @@ shot() {
 CALL="ccCheck.noStyleSettings({note:'Scroll Map Demo.md'})"
 report "light/live/desktop without Style Settings" "$(js "$CALL")"
 
+# Progress bar toggled off: the markers keep to the top of the note
+CALL="ccCheck.open({note:'Scroll Map Demo.md', view:'live', scheme:'light'})"
+report "light/live/desktop bar off" "$(js "$CALL")"
+js "ccCheck.setBar(false)" >/dev/null
+report "light/live/desktop bar off" "$(js "ccCheck.measure(['no-bar-map'])")"
+shot "Scroll-Map-Demo-light-live-desktop-bar-off"
+js "ccCheck.setBar(true)" >/dev/null
+
 for PLATFORM in desktop mobile; do
     if [[ $PLATFORM == mobile ]]; then
         tv eval code="app.emulateMobile(true); 'on'" >/dev/null

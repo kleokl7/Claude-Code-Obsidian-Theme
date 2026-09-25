@@ -10,6 +10,8 @@
                                                   (2026-07-07, 07-09/10)
      mobile-track  the mobile bar uses --cc-track-color (light-mode fix
                    95d6092 first missed mobile)             (2026-09-22)
+     no-bar-map    with the progress bar toggled off, markers stay at the
+                   top of the note, not on the view header  (2026-09-25)
      tasks         custom states with the Tasks plugin's reading-view
                    markup: no strike, no tick on / and >   (2026-09-09)
      links         unresolved links dotted, resolved ones plain */
@@ -110,6 +112,14 @@ var ccCheck = (function () {
     return JSON.stringify({ found: !!dot, x: box.left, y: hdr.top, w: box.width, dpr: devicePixelRatio });
   }
 
+  /* Style Settings → Scroll progress bar, on or off: its class-toggle on
+     <body>. Not saved — Style Settings writes it back on the next reload. */
+  async function setBar(on) {
+    document.body.classList.toggle('cc-scroll-progress', !!on);
+    await sleep(300);
+    return JSON.stringify([]);
+  }
+
   async function scroll(frac) {
     var s = scroller(leaf().view);
     s.scrollTop = frac * (s.scrollHeight - s.clientHeight);
@@ -133,6 +143,18 @@ var ccCheck = (function () {
       var d = dots(v), filled = d.filter(function (x) { return x.fill >= 0.99; }).length;
       return res('fill-end', d.length > 0 && filled === d.length,
         filled + ' of ' + d.length + ' filled at 100%');
+    },
+    'no-bar-map': function (v) {
+      var map = v.containerEl.querySelector('.cc-scroll-map');
+      if (!map) return res('no-bar-map', false, 'no scroll map');
+      var vc = v.containerEl.querySelector('.view-content');
+      var bar = getComputedStyle(vc, '::after').content;
+      var top = map.getBoundingClientRect().top, note = vc.getBoundingClientRect().top;
+      var hdr = v.containerEl.querySelector('.view-header').getBoundingClientRect().bottom;
+      return res('no-bar-map', bar === 'none' && Math.abs(top - note) < 1 && top >= hdr - 1,
+        (bar === 'none' ? '' : 'bar still on (Style Settings absent?); ') +
+        'map top ' + top.toFixed(1) + ', note top ' + note.toFixed(1) +
+        ', view header bottom ' + hdr.toFixed(1));
     },
     'mobile-track': function (v) {
       var vc = v.containerEl.querySelector('.view-content');
@@ -221,5 +243,5 @@ var ccCheck = (function () {
   }
 
   return { open: open, scroll: scroll, measure: measure, demo: demo, strip: strip,
-    noStyleSettings: noStyleSettings };
+    noStyleSettings: noStyleSettings, setBar: setBar };
 })();

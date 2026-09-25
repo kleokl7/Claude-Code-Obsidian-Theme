@@ -1,7 +1,7 @@
 {
   "id": "claude-scroll-map",
   "name": "Claude Scroll Map",
-  "version": "0.3.4",
+  "version": "0.3.5",
   "minAppVersion": "1.5.0",
   "description": "Clickable heading dots with name tooltips on a scroll progress strip. Companion to the Claude Code Orange theme.",
   "author": "kleokl7",

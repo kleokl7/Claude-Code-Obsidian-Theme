@@ -50,7 +50,7 @@ Two layers that answer *how far along am I* in long notes:
   ```
   from a checkout of this repo — or copy the three files in [`companion/claude-scroll-map`](companion/claude-scroll-map) into `<vault>/.obsidian/plugins/claude-scroll-map/` by hand. Then enable **Claude Scroll Map** in *Settings → Community plugins* (re-run the script and reload Obsidian to update it later).
 
-The theme alone gives you the progress bar; the plugin adds the dots.
+The theme alone gives you the progress bar; the plugin adds the dots. With the bar turned off, the dots keep their strip at the top of the note, without the fill-as-you-read cue.
 
 ## At a glance
 

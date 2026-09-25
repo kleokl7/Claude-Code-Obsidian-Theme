@@ -4,6 +4,13 @@
    out-rank these; the rules here just keep the plugin usable with any
    theme. */
 
+/* The strip's anchor is the note box. Obsidian leaves .view-content
+   static, which hands the strip to the whole tab: the markers would sit
+   on top of the view header. */
+.view-content:has(> .cc-scroll-map) {
+  position: relative;
+}
+
 .cc-scroll-map {
   position: absolute;
   top: 0;

@@ -1374,7 +1374,10 @@ body:is(.cc-scroll-progress, :not(.css-settings-manager)) .workspace-leaf-conten
     .markdown-preview-view {
     scroll-timeline: --cc-note-scroll block;
 }
-body:is(.cc-scroll-progress, :not(.css-settings-manager)) .workspace-leaf-content[data-type="markdown"] .view-content {
+/* The note box anchors the bar AND the scroll map, so this holds with the
+   bar toggled off too: a static .view-content hands the map to
+   .workspace-leaf-content, and the markers ride up onto the view header. */
+body .workspace-leaf-content[data-type="markdown"] .view-content {
     position: relative;
     /* let centered markers straddle the line without clipping.
        min-height: 0 is required with overflow:visible — it flips the
@@ -1482,7 +1485,8 @@ body .cc-scroll-map {
 /* With the progress bar on, the theme's track pseudo paints the backdrop
    band — a bg on the map would sit above the bar and hide it. With the
    bar toggled off, the plugin's own gradient band stays so markers never
-   float naked over note text. */
+   float naked over note text; the strip still sits at the top of the
+   note (the .view-content anchor above holds either way). */
 body:is(.cc-scroll-progress, :not(.css-settings-manager)) .cc-scroll-map { background: none; }
 body .cc-scroll-map:hover { height: 24px; }   /* roomier target while aiming */
 /* Mobile: markers ride the theme's BOTTOM progress bar, cut at their

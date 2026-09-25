@@ -11,7 +11,7 @@ personal paths never go in committed files — local vault paths live in
 | --- | --- |
 | `./scripts/check.sh` | Static checks: JSON files, `versions.json` entry, `theme.css` braces / nested comments / banners vs Contents, plugin syntax. Run after any scripted edit. |
 | `./scripts/dev-deploy.sh` | Copy theme + companion into the vaults in `.dev-vaults`, reload them in the running app, print `dev:errors`. `--check` only compares. |
-| `./scripts/live-check.sh` | Render `tests/fixtures` in the isolated `test-vault/` window and check marker spread/fill, the mobile bar, Tasks-plugin task states, unresolved links and console errors; screenshots of every scheme × view × platform. `--no-shots`, `--no-deploy`. |
+| `./scripts/live-check.sh` | Render `tests/fixtures` in the isolated `test-vault/` window and check marker spread/fill, markers with the bar off, the mobile bar, Tasks-plugin task states, unresolved links and console errors; screenshots of every scheme × view × platform. `--no-shots`, `--no-deploy`. |
 | `./scripts/readme-shots.sh` | Regenerate the README / storefront images from the demo fixtures. |
 | `./tests/release.test.sh` | `release.sh` against a fake `gh` and a local bare remote. |
 | `./release.sh --verify <ver>` | Read-only: does a GitHub release have all three files? |
